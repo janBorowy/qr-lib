@@ -1,7 +1,12 @@
 #pragma once
 
+#include "parameters.h"
+
+#include <cstddef>
 #include <string>
 
-enum class ENCODING_MODE { NUMERIC, ALPHANUMERIC, BYTE };
+enum class EncodingMode { NUMERIC, ALPHANUMERIC, BYTE };
 
-ENCODING_MODE analyze_encoding_mode(std::string& input);
+EncodingMode analyze_encoding_mode(const std::string& input);
+unsigned char determine_smallest_version(size_t input_len, EncodingMode,
+                                         ErrorCorrectionLevel);
