@@ -6,3 +6,4 @@ class MaxCapacityExceededException : public std::runtime_error {
     MaxCapacityExceededException(const std::string& message)
         : std::runtime_error{message} {}
 };
+

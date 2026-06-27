@@ -9,6 +9,6 @@ add_subdirectory(lib/Catch2)
 
 add_executable(qr-lib-tests test/test.cpp)
 target_link_libraries(qr-lib-tests PRIVATE Catch2::Catch2WithMain)
-target_sources(qr-lib-tests PRIVATE src/steps/data_analysis.cpp)
+target_sources(qr-lib-tests PRIVATE src/steps/data_analysis.cpp src/steps/data_encoding.cpp)
 
 target_sources(qr-lib-demo PRIVATE src/main.cpp)

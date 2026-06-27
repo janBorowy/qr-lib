@@ -2,6 +2,8 @@
 
 #include "../src/exceptions/max_capacity_exceeded.h"
 #include "../src/steps/data_analysis.h"
+#include "../src/steps/data_encoding.h"
+
 #include <cstdint>
 
 uint32_t factorial(uint32_t number) {
@@ -19,7 +21,7 @@ TEST_CASE("Determines the most efficient encoding_mode", "[data_analysis]") {
     REQUIRE(analyze_encoding_mode("a123456789") == EncodingMode::BYTE);
 }
 
-TEST_CASE("Determines the smallest version sufficient") {
+TEST_CASE("Determines the smallest sufficient version", "[data_analysis]") {
     REQUIRE(determine_smallest_version(11, EncodingMode::ALPHANUMERIC,
                                        ErrorCorrectionLevel::L) == 1);
     REQUIRE(determine_smallest_version(25, EncodingMode::ALPHANUMERIC,
@@ -44,4 +46,9 @@ TEST_CASE("Determines the smallest version sufficient") {
                                                  EncodingMode::ALPHANUMERIC,
                                                  ErrorCorrectionLevel::L),
                       MaxCapacityExceededException);
+}
+
+TEST_CASE("Encodes data correctly", "[data_encoding]") {
+    REQUIRE(encode_data("HELLO WORLD", EncodingMode::ALPHANUMERIC, 1) ==
+            std::string{"0010"} + "000001011");
 }
