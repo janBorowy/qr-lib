@@ -1,53 +1,123 @@
 #include "data_encoding.h"
 #include "data_analysis.h"
 #include <bitset>
+#include <vector>
 
-std::string get_mode_indicator(EncodingMode mode) {
+typedef std::bitset<sizeof(int) * 8> int_bits;
+
+void encode_mode_indicator(EncodingMode mode, std::vector<bool>& result) {
     switch (mode) {
     case EncodingMode::NUMERIC:
-        return "0001";
+        result.insert(result.end(), {0, 0, 0, 1});
+        break;
     case EncodingMode::ALPHANUMERIC:
-        return "0010";
+        result.insert(result.end(), {0, 0, 1, 0});
+        break;
     case EncodingMode::BYTE:
-        return "0100";
+        result.insert(result.end(), {0, 1, 0, 0});
+        break;
     }
 }
 
-int get_character_count_length(EncodingMode mode, unsigned char version) {
+void encode_count_indicator(EncodingMode mode, unsigned char version,
+                            size_t data_len, std::vector<bool>& result) {
+    int count_indicator_len = 0;
     switch (mode) {
     case EncodingMode::NUMERIC:
         if (version < 10) {
-            return 10;
+            count_indicator_len = 10;
         } else if (version < 27) {
-            return 12;
+            count_indicator_len = 12;
+        } else {
+            count_indicator_len = 14;
         }
-        return 14;
+        break;
     case EncodingMode::ALPHANUMERIC:
         if (version < 10) {
-            return 9;
+            count_indicator_len = 9;
         } else if (version < 27) {
-            return 11;
+            count_indicator_len = 11;
+        } else {
+            count_indicator_len = 13;
         }
-        return 13;
+        break;
     case EncodingMode::BYTE:
         if (version < 10) {
-            return 8;
+            count_indicator_len = 8;
+        } else {
+            count_indicator_len = 16;
         }
-        return 16;
+        break;
+    }
+
+    auto count_indicator_bits = int_bits(data_len);
+
+    for (int i = count_indicator_len - 1; i >= 0; i--) {
+        result.push_back(count_indicator_bits[i]);
     }
 }
 
-std::string encoded_message(const std::string& message, EncodingMode mode) {
+void encode_numeric_group(const std::string& numeric_str,
+                          std::vector<bool>& output) {
+    auto grouped_bits = int_bits(std::stoi(numeric_str));
+
+    int encoded_size = 10;
+    if (numeric_str.size() == 2) {
+        encoded_size = 7;
+    } else if (numeric_str.size() == 1) {
+        encoded_size = 4;
+    }
+
+    for (int i = encoded_size - 1; i >= 0; i--) {
+        output.push_back(grouped_bits[i]);
+    }
+}
+
+void encode_numeric(const std::string& message, std::vector<bool>& result) {
+    int k = 0;
+
+    for (auto i = 0; i != message.size(); i++) {
+        k++;
+        if (k == 3) {
+            encode_numeric_group(message.substr(i - 2, 3), result);
+            k = 0;
+        }
+    }
+
+    if (k == 2) {
+        encode_numeric_group(message.substr(message.size() - 2, 2), result);
+    } else if (k == 1) {
+        encode_numeric_group(message.substr(message.size() - 1, 1), result);
+    }
+}
+
+std::vector<bool> encode_alpha(const std::string& message,
+                               std::vector<bool>& result) {
+    return std::vector<bool>{};
+}
+std::vector<bool> encode_byte(const std::string& message,
+                              std::vector<bool>& result) {
+    return std::vector<bool>{};
+}
+
+void encode_message(const std::string& message, EncodingMode mode,
+                    std::vector<bool>& result) {
     std::string encoded_message;
+    switch (mode) {
+    case EncodingMode::NUMERIC:
+        encode_numeric(message, result);
+    case EncodingMode::ALPHANUMERIC:
+        encode_alpha(message, result);
+    case EncodingMode::BYTE:
+        encode_byte(message, result);
+    }
 }
 
-std::string encode_data(const std::string& data, EncodingMode mode,
-                        unsigned char version) {
-    auto mode_indicator = get_mode_indicator(mode);
-    auto count_indicator_len = get_character_count_length(mode, version);
-    auto count_indicator_str = std::bitset<32>(data.size()).to_string();
-    count_indicator_str = count_indicator_str.substr(
-        count_indicator_str.size() - count_indicator_len);
-    auto encoded_message = encode_message(data, mode);
-    return mode_indicator + count_indicator_str;
+std::vector<bool> encode_data(const std::string& data, EncodingMode mode,
+                              unsigned char version) {
+    std::vector<bool> result;
+    encode_mode_indicator(mode, result);
+    encode_count_indicator(mode, version, data.size(), result);
+    encode_message(data, mode, result);
+    return result;
 }
