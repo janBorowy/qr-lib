@@ -60,10 +60,23 @@ TEST_CASE("Determines the smallest sufficient version", "[data_analysis]") {
                       MaxCapacityExceededException);
 }
 
-TEST_CASE("Encodes data correctly", "[data_encoding]") {
-    // REQUIRE(encode_data("HELLO WORLD", EncodingMode::ALPHANUMERIC, 1) ==
-    //         std::string{"0010"} + "000001011");
+TEST_CASE("Encodes numeric data correctly", "[data_encoding]") {
 
+    REQUIRE(encode_data("8", EncodingMode::NUMERIC, 1) ==
+            str_to_bits("0001 0000000001 1000"));
+    REQUIRE(encode_data("87", EncodingMode::NUMERIC, 1) ==
+            str_to_bits("0001 0000000010 1010111"));
     REQUIRE(encode_data("867", EncodingMode::NUMERIC, 1) ==
             str_to_bits("0001 0000000011 1101100011"));
+    REQUIRE(encode_data("8675", EncodingMode::NUMERIC, 1) ==
+            str_to_bits("0001 0000000100 1101100011 0101"));
+    REQUIRE(encode_data("86754", EncodingMode::NUMERIC, 1) ==
+            str_to_bits("0001 0000000101 1101100011 0110110"));
+    REQUIRE(encode_data("867541", EncodingMode::NUMERIC, 1) ==
+            str_to_bits("0001 0000000110 1101100011 1000011101"));
+}
+
+TEST_CASE("Encodes alphanumeric data correctly", "[data_encoding]") {
+    // REQUIRE(encode_data("HELLO WORLD", EncodingMode::ALPHANUMERIC, 1) ==
+    //         std::string{"0010"} + "000001011");
 }

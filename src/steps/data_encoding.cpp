@@ -1,9 +1,19 @@
 #include "data_encoding.h"
 #include "data_analysis.h"
 #include <bitset>
+#include <unordered_map>
 #include <vector>
 
 typedef std::bitset<sizeof(int) * 8> int_bits;
+
+std::unordered_map<char, int> ALPHANUMERIC_TO_VAL = {
+    {'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},  {'4', 4},  {'5', 5},  {'6', 6},
+    {'7', 7},  {'8', 8},  {'9', 9},  {'A', 10}, {'B', 11}, {'C', 12}, {'D', 13},
+    {'E', 14}, {'F', 15}, {'G', 16}, {'H', 17}, {'I', 18}, {'J', 19}, {'K', 20},
+    {'L', 21}, {'M', 22}, {'N', 23}, {'O', 24}, {'P', 25}, {'Q', 26}, {'R', 27},
+    {'S', 28}, {'T', 29}, {'U', 30}, {'V', 31}, {'W', 32}, {'X', 33}, {'Y', 34},
+    {'Z', 35}, {' ', 36}, {'$', 37}, {'%', 38}, {'*', 39}, {'+', 40}, {'-', 41},
+    {'.', 42}, {'/', 43}, {':', 44}};
 
 void encode_mode_indicator(EncodingMode mode, std::vector<bool>& result) {
     switch (mode) {
@@ -91,14 +101,8 @@ void encode_numeric(const std::string& message, std::vector<bool>& result) {
     }
 }
 
-std::vector<bool> encode_alpha(const std::string& message,
-                               std::vector<bool>& result) {
-    return std::vector<bool>{};
-}
-std::vector<bool> encode_byte(const std::string& message,
-                              std::vector<bool>& result) {
-    return std::vector<bool>{};
-}
+void encode_alpha(const std::string& message, std::vector<bool>& result) {}
+void encode_byte(const std::string& message, std::vector<bool>& result) {}
 
 void encode_message(const std::string& message, EncodingMode mode,
                     std::vector<bool>& result) {
