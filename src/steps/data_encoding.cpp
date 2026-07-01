@@ -1,19 +1,10 @@
 #include "data_encoding.h"
-#include "data_analysis.h"
-#include "parameters.h"
+#include "qr.h"
+#include <algorithm>
 #include <bitset>
-#include <iterator>
-#include <unordered_map>
 #include <vector>
 
-std::unordered_map<char, int> ALPHANUMERIC_TO_VAL = {
-    {'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},  {'4', 4},  {'5', 5},  {'6', 6},
-    {'7', 7},  {'8', 8},  {'9', 9},  {'A', 10}, {'B', 11}, {'C', 12}, {'D', 13},
-    {'E', 14}, {'F', 15}, {'G', 16}, {'H', 17}, {'I', 18}, {'J', 19}, {'K', 20},
-    {'L', 21}, {'M', 22}, {'N', 23}, {'O', 24}, {'P', 25}, {'Q', 26}, {'R', 27},
-    {'S', 28}, {'T', 29}, {'U', 30}, {'V', 31}, {'W', 32}, {'X', 33}, {'Y', 34},
-    {'Z', 35}, {' ', 36}, {'$', 37}, {'%', 38}, {'*', 39}, {'+', 40}, {'-', 41},
-    {'.', 42}, {'/', 43}, {':', 44}};
+using namespace qr;
 
 void encode_mode_indicator(EncodingMode mode, std::vector<bool>& result) {
     switch (mode) {
@@ -108,7 +99,8 @@ void encode_alpha(const std::string& message, std::vector<bool>& result) {
     char prev;
     for (const auto& c : message) {
         if (is_even) {
-            int value = ALPHANUMERIC_TO_VAL[prev] * 45 + ALPHANUMERIC_TO_VAL[c];
+            int value = qr::ALPHANUMERIC_TO_VAL.at(prev) * 45 +
+                        qr::ALPHANUMERIC_TO_VAL.at(c);
             push_back_bits<32>(11, std::bitset<32>(value), result);
         }
         prev = c;
@@ -116,8 +108,8 @@ void encode_alpha(const std::string& message, std::vector<bool>& result) {
     }
 
     if (is_even) {
-        auto bits =
-            std::bitset<32>(ALPHANUMERIC_TO_VAL[message[message.length() - 1]]);
+        auto bits = std::bitset<32>(
+            qr::ALPHANUMERIC_TO_VAL.at(message[message.length() - 1]));
         push_back_bits<32>(6, bits, result);
     }
 }
@@ -143,11 +135,33 @@ void encode_message(const std::string& message, EncodingMode mode,
     }
 }
 
+void encode_terminator_and_padding(const std::string& data,
+                                   unsigned char version,
+                                   ErrorCorrectionLevel ec_level,
+                                   std::vector<bool>& result) {
+    auto data_bits = VERSION_AND_EC_TO_DATA_CODEWORDS[version][ec_level] * 8;
+    auto terminator_len = std::min(data_bits - result.size(), 4uz);
+    push_back_bits<4>(terminator_len, std::bitset<4>{"0000"}, result);
+    auto padding_zeroes = (8 - result.size() % 8) % 8;
+    push_back_bits<7>(padding_zeroes, std::bitset<7>{"0000000"}, result);
+    auto is_even = false;
+    while (result.size() < data_bits) {
+        if (is_even) {
+            push_back_bits<8>(8, std::bitset<8>{"11101100"}, result);
+        } else {
+            push_back_bits<8>(8, std::bitset<8>{"00010001"}, result);
+        }
+        is_even = !is_even;
+    }
+}
+
 std::vector<bool> encode_data(const std::string& data, EncodingMode mode,
-                              unsigned char version, ErrorCorrectionLevel ec_level) {
+                              unsigned char version,
+                              ErrorCorrectionLevel ec_level) {
     std::vector<bool> result;
     encode_mode_indicator(mode, result);
     encode_count_indicator(mode, version, data.size(), result);
     encode_message(data, mode, result);
+    encode_terminator_and_padding(data, version, ec_level, result);
     return result;
 }

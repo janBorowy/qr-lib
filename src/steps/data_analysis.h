@@ -1,12 +1,10 @@
 #pragma once
 
-#include "parameters.h"
+#include "qr.h"
 
 #include <cstddef>
 #include <string>
 
-enum class EncodingMode { NUMERIC, ALPHANUMERIC, BYTE };
-
-EncodingMode analyze_encoding_mode(const std::string& input);
-unsigned char determine_smallest_version(size_t input_len, EncodingMode,
-                                         ErrorCorrectionLevel);
+qr::EncodingMode analyze_encoding_mode(const std::string& input);
+unsigned char determine_smallest_version(size_t input_len, qr::EncodingMode,
+                                         qr::ErrorCorrectionLevel);
