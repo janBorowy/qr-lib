@@ -1,10 +1,10 @@
 #include "data_encoding.h"
 #include "data_analysis.h"
+#include "parameters.h"
 #include <bitset>
+#include <iterator>
 #include <unordered_map>
 #include <vector>
-
-typedef std::bitset<sizeof(int) * 8> int_bits;
 
 std::unordered_map<char, int> ALPHANUMERIC_TO_VAL = {
     {'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},  {'4', 4},  {'5', 5},  {'6', 6},
@@ -26,6 +26,14 @@ void encode_mode_indicator(EncodingMode mode, std::vector<bool>& result) {
     case EncodingMode::BYTE:
         result.insert(result.end(), {0, 1, 0, 0});
         break;
+    }
+}
+
+template <unsigned int N>
+void push_back_bits(int len, const std::bitset<N>& bits,
+                    std::vector<bool>& result) {
+    for (int i = len - 1; i >= 0; i--) {
+        result.push_back(bits[i]);
     }
 }
 
@@ -60,16 +68,12 @@ void encode_count_indicator(EncodingMode mode, unsigned char version,
         break;
     }
 
-    auto count_indicator_bits = int_bits(data_len);
-
-    for (int i = count_indicator_len - 1; i >= 0; i--) {
-        result.push_back(count_indicator_bits[i]);
-    }
+    push_back_bits<32>(count_indicator_len, std::bitset<32>(data_len), result);
 }
 
 void encode_numeric_group(const std::string& numeric_str,
-                          std::vector<bool>& output) {
-    auto grouped_bits = int_bits(std::stoi(numeric_str));
+                          std::vector<bool>& result) {
+    auto grouped_bits = std::bitset<32>(std::stoi(numeric_str));
 
     int encoded_size = 10;
     if (numeric_str.size() == 2) {
@@ -78,9 +82,7 @@ void encode_numeric_group(const std::string& numeric_str,
         encoded_size = 4;
     }
 
-    for (int i = encoded_size - 1; i >= 0; i--) {
-        output.push_back(grouped_bits[i]);
-    }
+    push_back_bits<32>(encoded_size, grouped_bits, result);
 }
 
 void encode_numeric(const std::string& message, std::vector<bool>& result) {
@@ -101,8 +103,29 @@ void encode_numeric(const std::string& message, std::vector<bool>& result) {
     }
 }
 
-void encode_alpha(const std::string& message, std::vector<bool>& result) {}
-void encode_byte(const std::string& message, std::vector<bool>& result) {}
+void encode_alpha(const std::string& message, std::vector<bool>& result) {
+    bool is_even = false;
+    char prev;
+    for (const auto& c : message) {
+        if (is_even) {
+            int value = ALPHANUMERIC_TO_VAL[prev] * 45 + ALPHANUMERIC_TO_VAL[c];
+            push_back_bits<32>(11, std::bitset<32>(value), result);
+        }
+        prev = c;
+        is_even = !is_even;
+    }
+
+    if (is_even) {
+        auto bits =
+            std::bitset<32>(ALPHANUMERIC_TO_VAL[message[message.length() - 1]]);
+        push_back_bits<32>(6, bits, result);
+    }
+}
+void encode_byte(const std::string& message, std::vector<bool>& result) {
+    for (const auto& c : message) {
+        push_back_bits<8>(8, std::bitset<8>(c), result);
+    }
+}
 
 void encode_message(const std::string& message, EncodingMode mode,
                     std::vector<bool>& result) {
@@ -110,15 +133,18 @@ void encode_message(const std::string& message, EncodingMode mode,
     switch (mode) {
     case EncodingMode::NUMERIC:
         encode_numeric(message, result);
+        break;
     case EncodingMode::ALPHANUMERIC:
         encode_alpha(message, result);
+        break;
     case EncodingMode::BYTE:
         encode_byte(message, result);
+        break;
     }
 }
 
 std::vector<bool> encode_data(const std::string& data, EncodingMode mode,
-                              unsigned char version) {
+                              unsigned char version, ErrorCorrectionLevel ec_level) {
     std::vector<bool> result;
     encode_mode_indicator(mode, result);
     encode_count_indicator(mode, version, data.size(), result);

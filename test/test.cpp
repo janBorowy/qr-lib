@@ -1,3 +1,4 @@
+#include <bitset>
 #include <catch2/catch_test_macros.hpp>
 
 #include "../src/exceptions/max_capacity_exceeded.h"
@@ -19,6 +20,15 @@ std::vector<bool> str_to_bits(const std::string& str) {
             result.push_back(0);
         }
     }
+    return result;
+}
+
+std::string hex_to_bytes(std::vector<unsigned char> hex) {
+    std::string result;
+    for (const auto& c : hex) {
+        result.append(std::bitset<8>(c).to_string());
+    }
+
     return result;
 }
 
@@ -77,6 +87,23 @@ TEST_CASE("Encodes numeric data correctly", "[data_encoding]") {
 }
 
 TEST_CASE("Encodes alphanumeric data correctly", "[data_encoding]") {
-    // REQUIRE(encode_data("HELLO WORLD", EncodingMode::ALPHANUMERIC, 1) ==
-    //         std::string{"0010"} + "000001011");
+    REQUIRE(encode_data("H", EncodingMode::ALPHANUMERIC, 1) ==
+            str_to_bits("0010 000000001 010001"));
+    REQUIRE(encode_data("HE", EncodingMode::ALPHANUMERIC, 1) ==
+            str_to_bits("0010 000000010 01100001011"));
+    REQUIRE(encode_data("HELLO WORLD", EncodingMode::ALPHANUMERIC, 1) ==
+            str_to_bits("0010 000001011 01100001011 01111000110 10001011100"
+                        "10110111000 10011010100 001101"));
+    REQUIRE(encode_data("HELLO WORLD$", EncodingMode::ALPHANUMERIC, 1) ==
+            str_to_bits("0010 000001100 01100001011 01111000110 10001011100"
+                        "10110111000 10011010100 01001101110"));
+}
+
+TEST_CASE("Encodes byte data correctly", "[data_encoding]") {
+    REQUIRE(encode_data("H", EncodingMode::BYTE, 1) ==
+            str_to_bits("0100 00000001 " + hex_to_bytes({0x48})));
+    REQUIRE(encode_data("Hello, World!", EncodingMode::BYTE, 1) ==
+            str_to_bits("0100 00001101 " +
+                        hex_to_bytes({0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20,
+                                      0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21})));
 }
