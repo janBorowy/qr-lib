@@ -6,7 +6,6 @@
 #include "../src/steps/data_encoding.h"
 
 #include <cstdint>
-#include <iostream>
 
 using namespace qr;
 

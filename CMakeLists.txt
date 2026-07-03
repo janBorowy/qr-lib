@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 3.31)
 set (CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE DEBUG)
 
 project(qr-lib)
 add_executable(qr-lib-demo)
 
 add_subdirectory(lib/Catch2)
 
-add_executable(qr-lib-tests test/test.cpp)
+add_executable(qr-lib-tests test/data_encoding_tests.cpp
+			    test/ec_generation_tests.cpp
+)
 target_link_libraries(qr-lib-tests PRIVATE Catch2::Catch2WithMain)
-target_sources(qr-lib-tests PRIVATE src/steps/data_analysis.cpp src/steps/data_encoding.cpp)
+target_sources(qr-lib-tests PRIVATE src/steps/data_analysis.cpp
+src/steps/data_encoding.cpp
+src/steps/error_correction/gf_polynomial.cpp
+)
 
 target_sources(qr-lib-demo PRIVATE src/main.cpp)
