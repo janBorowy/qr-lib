@@ -15,6 +15,7 @@ target_link_libraries(qr-lib-tests PRIVATE Catch2::Catch2WithMain)
 target_sources(qr-lib-tests PRIVATE src/steps/data_analysis.cpp
 src/steps/data_encoding.cpp
 src/steps/error_correction/gf_polynomial.cpp
+src/steps/error_correction/generator_polynomial.cpp
 )
 
 target_sources(qr-lib-demo PRIVATE src/main.cpp)

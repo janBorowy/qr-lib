@@ -2,6 +2,7 @@
 #include "alpha_notation_conversion.h"
 
 GFPolynomial::GFPolynomial() : coefs{} {}
+GFPolynomial::GFPolynomial(Coefs&& coefs) : coefs{std::move(coefs)} {};
 
 void GFPolynomial::set_coef(unsigned char exponent, unsigned char value) {
     if (value != 0) {
@@ -10,6 +11,10 @@ void GFPolynomial::set_coef(unsigned char exponent, unsigned char value) {
         coefs.erase(exponent);
     }
 }
+
+bool GFPolynomial::operator==(const GFPolynomial& other) const {
+    return coefs == other.coefs;
+};
 
 unsigned char GFPolynomial::operator[](unsigned char exponent) const {
     return coefs.contains(exponent) ? coefs.at(exponent) : 0;
@@ -26,16 +31,18 @@ void substract(const GFPolynomial& first, const GFPolynomial& second,
     }
 }
 
-void GFPolynomial::multiply(const GFPolynomial& other,
-                            GFPolynomial& result) const {
+GFPolynomial GFPolynomial::multiply(const GFPolynomial& other) const {
+    GFPolynomial result;
     for (const auto& [exp_first, val_first] : coefs) {
         for (const auto& [exp_second, val_second] : other.coefs) {
-            auto val_to_add = ALPHA_TO_INT[INT_TO_ALPHA[val_first] +
-                                           INT_TO_ALPHA[val_second]];
+            auto val_to_add = ALPHA_TO_INT[(INT_TO_ALPHA[val_first] +
+                                            INT_TO_ALPHA[val_second]) %
+                                           255];
             result.set_coef(exp_first + exp_second,
                             val_to_add ^ result[exp_first + exp_second]);
         }
     }
+    return result;
 }
 
 void GFPolynomial::divide(const GFPolynomial& other,

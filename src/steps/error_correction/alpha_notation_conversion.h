@@ -20,7 +20,7 @@ constexpr std::array<unsigned char, 256> ALPHA_TO_INT = make_alpha_to_int();
 
 constexpr std::array<unsigned char, 256> make_int_to_alpha() {
     std::array<unsigned char, 256> result;
-    for (int i = 1; i < 256; i++) {
+    for (int i = 1; i < 254; i++) {
         result[ALPHA_TO_INT[i]] = i;
     }
     return result;
