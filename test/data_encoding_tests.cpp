@@ -1,9 +1,10 @@
-#include <bitset>
-#include <catch2/catch_test_macros.hpp>
-
 #include "../src/exceptions/max_capacity_exceeded.h"
 #include "../src/steps/data_analysis.h"
 #include "../src/steps/data_encoding.h"
+#include "test_utils.h"
+
+#include <bitset>
+#include <catch2/catch_test_macros.hpp>
 
 #include <cstdint>
 
@@ -11,18 +12,6 @@ using namespace qr;
 
 uint32_t factorial(uint32_t number) {
     return number <= 1 ? number : factorial(number - 1) * number;
-}
-
-std::vector<bool> str_to_bits(const std::string& str) {
-    std::vector<bool> result;
-    for (const auto& c : str) {
-        if (c == '1') {
-            result.push_back(1);
-        } else if (c == '0') {
-            result.push_back(0);
-        }
-    }
-    return result;
 }
 
 std::string hex_to_bytes(std::vector<unsigned char> hex) {

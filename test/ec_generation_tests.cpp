@@ -1,7 +1,10 @@
 #include "../src/steps/error_correction/alpha_notation_conversion.h"
+#include "../src/steps/error_correction/ec_generation.h"
 #include "../src/steps/error_correction/generator_polynomial.h"
 #include "../src/steps/error_correction/gf_polynomial.h"
 #include "catch2/catch_test_macros.hpp"
+#include "test_utils.h"
+#include <vector>
 
 TEST_CASE("Generates alpha conversion table", "[alpha_conv]") {
     REQUIRE(ALPHA_TO_INT[0] == 1);
@@ -38,4 +41,14 @@ TEST_CASE("Calculates generator polynomial", "[ec_generation]") {
     REQUIRE(
         get_generator_polynomial(5) ==
         GFPolynomial({{5, 1}, {4, 31}, {3, 198}, {2, 63}, {1, 147}, {0, 116}}));
+}
+
+TEST_CASE("Calculates error codewords", "[ec_generation]") {
+    // HELLO WORLD
+    REQUIRE(
+        generate_ec_codewords(
+            str_to_bits("00100000 01011011 00001011 01111000 11010001 01110010"
+                        "11011100 01001101 01000011 01000000 11101100 00010001"
+                        "11101100 00010001 11101100 00010001"),
+            10) == std::vector<bool>());
 }
