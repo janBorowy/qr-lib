@@ -155,13 +155,32 @@ void encode_terminator_and_padding(const std::string& data,
     }
 }
 
-std::vector<bool> encode_data(const std::string& data, EncodingMode mode,
-                              unsigned char version,
-                              ErrorCorrectionLevel ec_level) {
+std::vector<Codeword> bits_to_codewords(const std::vector<bool>& bits) {
+    int bytes = bits.size() / 8;
+    std::vector<Codeword> result;
+    int current_value = 0;
+    for (int byte = 0; byte < bytes; byte++) {
+        int bytes_remaining = bytes - byte;
+        for (auto it = bits.rbegin() + 8 * (bytes_remaining - 1);
+             it < bits.rbegin() + 8 * bytes_remaining; it++) {
+            if (*it) {
+                current_value +=
+                    1 << (it - (bits.rbegin() + 8 * (bytes_remaining - 1)));
+            }
+        }
+        result.push_back(current_value);
+        current_value = 0;
+    }
+    return result;
+}
+
+std::vector<qr::Codeword> encode_data(const std::string& data,
+                                      EncodingMode mode, unsigned char version,
+                                      ErrorCorrectionLevel ec_level) {
     std::vector<bool> result;
     encode_mode_indicator(mode, result);
     encode_count_indicator(mode, version, data.size(), result);
     encode_message(data, mode, result);
     encode_terminator_and_padding(data, version, ec_level, result);
-    return result;
+    return bits_to_codewords(result);
 }

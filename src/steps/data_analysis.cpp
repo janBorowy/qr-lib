@@ -35,17 +35,17 @@ determine_smallest_version(size_t input_len, EncodingMode mode,
                            ErrorCorrectionLevel correction_level) {
     int version = 1;
 
-    while (version <= VERSIONS_AVAILBALE &&
+    while (version <= VERSIONS_AVAILABLE &&
            VERSION_CAPACITIES.at(correction_level).at(mode)[version - 1] <
                input_len) {
         version++;
     }
 
-    if (version > VERSIONS_AVAILBALE) {
+    if (version > VERSIONS_AVAILABLE) {
         throw MaxCapacityExceededException(
             std::format("Maximum capacity ({}) exceeded",
                         VERSION_CAPACITIES.at(correction_level)
-                            .at(mode)[VERSIONS_AVAILBALE - 1]));
+                            .at(mode)[VERSIONS_AVAILABLE - 1]));
     }
 
     return version;

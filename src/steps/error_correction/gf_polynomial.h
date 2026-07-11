@@ -20,8 +20,15 @@ class GFPolynomial {
     unsigned char operator[](unsigned char exponent) const;
     unsigned char get_alpha_exp(unsigned char x_exponent) const;
 
-    void multiply_all_exp(int n);
+    void add_all_exp(int n);
+    void subtract_all_exp(int n);
     GFPolynomial multiply(const GFPolynomial& other) const;
-    GFPolynomial multiply(int multiplier);
-    void divide(const GFPolynomial& other, GFPolynomial& reminder) const;
+    void multiply(int multiplier);
+    void reed_solomon_divide(const GFPolynomial& generator_poly,
+                             GFPolynomial& reminder) const;
+    unsigned char get_highest_exp() const;
+    unsigned char get_word_count() const;
 };
+
+GFPolynomial reed_solomon_divide(const GFPolynomial& message_poly,
+                                 const GFPolynomial& generator_poly);

@@ -1,5 +1,7 @@
 #include "gf_polynomial.h"
 #include "alpha_notation_conversion.h"
+#include <algorithm>
+#include <cassert>
 
 GFPolynomial::GFPolynomial() : coefs{} {}
 GFPolynomial::GFPolynomial(const Coefs& coefs) : coefs(coefs) {};
@@ -48,26 +50,64 @@ GFPolynomial GFPolynomial::multiply(const GFPolynomial& other) const {
     return result;
 }
 
-GFPolynomial GFPolynomial::multiply(int multiplier) {
+void GFPolynomial::multiply(int multiplier) {
     for (auto& [exp, val] : coefs) {
         coefs[exp] = gf_multiplication(val, multiplier);
     }
 }
 
-void GFPolynomial::divide(const GFPolynomial& other,
-                          GFPolynomial& reminder) const {
-    GFPolynomial dividend;
-    for (int i = 0; i < coefs.size(); i++) {
-        GFPolynomial divisor(other);
-        divisor.multiply(coefs.begin()->second);
-    }
+unsigned char GFPolynomial::get_highest_exp() const {
+    return coefs.begin()->first;
 }
 
-void GFPolynomial::multiply_all_exp(int n) {
+unsigned char GFPolynomial::get_word_count() const { return coefs.size(); }
+
+GFPolynomial xor_poly_values(const GFPolynomial& first,
+                             const GFPolynomial& second) {
+
+    GFPolynomial result(first);
+    unsigned char highest_exp =
+        std::max(first.get_highest_exp(), second.get_highest_exp());
+
+    for (int exp = highest_exp; exp >= 0; exp--) {
+        result.set_coef(exp, first[exp] ^ second[exp]);
+    }
+    return result;
+}
+
+GFPolynomial reed_solomon_divide(const GFPolynomial& message_poly,
+                                 const GFPolynomial& generator_poly) {
+    GFPolynomial dividend(message_poly);
+    GFPolynomial divisor(generator_poly);
+    for (int i = 0; i < message_poly.get_word_count(); i++) {
+        GFPolynomial current_div(divisor);
+        current_div.multiply(dividend[dividend.get_highest_exp()]);
+        dividend = xor_poly_values(dividend, current_div);
+        divisor.subtract_all_exp(1);
+    }
+    return dividend;
+}
+
+void GFPolynomial::add_all_exp(int n) {
+    assert(n >= 0);
+
     Coefs old_coefs(coefs);
 
     for (const auto& [exp, val] : old_coefs) {
         coefs.erase(exp);
         coefs[exp + n] = val;
+    }
+}
+
+void GFPolynomial::subtract_all_exp(int n) {
+    assert(n >= 0);
+    assert((--coefs.end())->second - n >= 0);
+
+    Coefs old_coefs(coefs);
+
+    for (auto it = old_coefs.rbegin(); it != old_coefs.rend(); it++) {
+        auto& [exp, val] = *it;
+        coefs.erase(exp);
+        coefs[exp - n] = val;
     }
 }

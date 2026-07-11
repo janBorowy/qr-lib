@@ -3,8 +3,6 @@
 #include "../src/steps/error_correction/generator_polynomial.h"
 #include "../src/steps/error_correction/gf_polynomial.h"
 #include "catch2/catch_test_macros.hpp"
-#include "test_utils.h"
-#include <vector>
 
 TEST_CASE("Generates alpha conversion table", "[alpha_conv]") {
     REQUIRE(ALPHA_TO_INT[0] == 1);
@@ -43,12 +41,44 @@ TEST_CASE("Calculates generator polynomial", "[ec_generation]") {
         GFPolynomial({{5, 1}, {4, 31}, {3, 198}, {2, 63}, {1, 147}, {0, 116}}));
 }
 
-TEST_CASE("Calculates error codewords", "[ec_generation]") {
-    // HELLO WORLD
-    REQUIRE(
-        generate_ec_codewords(
-            str_to_bits("00100000 01011011 00001011 01111000 11010001 01110010"
-                        "11011100 01001101 01000011 01000000 11101100 00010001"
-                        "11101100 00010001 11101100 00010001"),
-            10) == std::vector<bool>());
+TEST_CASE("Calculates error codewords", "[ec_generation]") { // HELLO WORLD
+    REQUIRE(generate_ec_codewords({32, 91, 11, 120, 209, 114, 220, 77, 67, 64,
+                                   236, 17, 236, 17, 236, 17},
+                                  10) ==
+            std::vector<unsigned char>{196, 35, 39, 119, 235, 215, 231, 226, 93,
+                                       23});
+
+    REQUIRE(generate_ec_codewords(
+                {67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38},
+                18) == std::vector<unsigned char>{213, 199, 11, 45, 115, 247,
+                                                  241, 223, 229, 248, 154, 117,
+                                                  154, 111, 86, 161, 111, 39});
+
+    REQUIRE(generate_ec_codewords(
+                {67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38},
+                18) == std::vector<unsigned char>{213, 199, 11, 45, 115, 247,
+                                                  241, 223, 229, 248, 154, 117,
+                                                  154, 111, 86, 161, 111, 39});
+
+    REQUIRE(generate_ec_codewords({246, 246, 66, 7, 118, 134, 242, 7, 38, 86,
+                                   22, 198, 199, 146, 6},
+                                  18) ==
+            std::vector<unsigned char>{87, 204, 96, 60, 202, 182, 124, 157, 200,
+                                       134, 27, 129, 209, 17, 163, 163, 120,
+                                       133});
+
+    REQUIRE(generate_ec_codewords({182, 230, 247, 119, 50, 7, 118, 134, 87, 38,
+                                   82, 6, 134, 151, 50, 7},
+                                  18) ==
+            std::vector<unsigned char>{148, 116, 177, 212, 76, 133, 75, 242,
+                                       238, 76, 195, 230, 189, 10, 108, 240,
+                                       192, 141});
+
+    REQUIRE(generate_ec_codewords({70, 247, 118, 86, 194, 6, 151, 50, 224, 236,
+                                   17, 236, 17, 236, 17, 236},
+                                  18) ==
+            std::vector<unsigned char>{140, 100, 250, 247, 108, 131, 37, 104,
+                                       253, 113, 111, 235, 197, 83, 6, 205, 89,
+                                       74});
 }
+

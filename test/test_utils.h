@@ -1,6 +1,7 @@
 #pragma once
 
+#include "../src/steps/qr.h"
 #include <string>
 #include <vector>
 
-std::vector<bool> str_to_bits(const std::string& str);
+std::vector<qr::Codeword> str_to_codewords(const std::string& str);
