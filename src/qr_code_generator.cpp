@@ -1,19 +1,19 @@
 #include "qr_code_generator.h"
+#include "data_masking/data_mask_resolver.h"
+#include "qr_color_constants.h"
+#include "qr_function_patterns.h"
 #include "steps/codewords_assembly.h"
 #include "steps/data_analysis.h"
 #include "steps/data_encoding.h"
 #include "steps/qr.h"
 #include <bitset>
+#include <cassert>
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
 using namespace cimg_library;
-
-constexpr unsigned char BLACK[] = {0, 0, 0};
-constexpr unsigned char EMPTY[] = {64, 0, 0};
-constexpr unsigned char RESERVED[] = {196, 0, 0};
-constexpr unsigned char WHITE[] = {255, 0, 0};
 
 std::vector<bool>
 serialize_codewords_to_bits_and_pad(const std::vector<qr::Codeword> codewords,
@@ -32,32 +32,35 @@ serialize_codewords_to_bits_and_pad(const std::vector<qr::Codeword> codewords,
     return bits;
 }
 
-void draw_square(CImg<unsigned char>& img, int x, int y, int s,
-                 const unsigned char color[3]) {
-    auto x_end = x + s - 1;
-    auto y_end = y + s - 1;
-    img.draw_line(x, y, x_end, y, color);
-    img.draw_line(x, y, x, y_end, color);
-    img.draw_line(x_end, y, x_end, y_end, color);
-    img.draw_line(x, y_end, x_end, y_end, color);
+void reserve_separators(CImg<unsigned char>& img, size_t size) {
+    img.draw_line(0, 8, 5, 8, RESERVED);
+    img.atXY(7, 8) = RESERVED[0];
+    img.atXY(8, 8) = RESERVED[0];
+    img.atXY(8, 7) = RESERVED[0];
+    img.draw_line(8, 0, 8, 5, RESERVED);
+
+    img.draw_line(size - 8, 8, size - 1, 8, RESERVED);
+    img.draw_line(8, size - 7, 8, size - 1, RESERVED);
 }
 
-void draw_finder_pattern(CImg<unsigned char>& img, int x, int y) {
-    draw_square(img, x, y, 7, BLACK);
-    draw_square(img, x + 1, y + 1, 5, WHITE);
-    draw_square(img, x + 2, y + 2, 3, BLACK);
-    img.atXY(x + 3, y + 3) = 0;
+void reserve_version_information(CImg<unsigned char>& img, size_t size) {
+    img.draw_rectangle(size - 11, 0, size - 9, 5, RESERVED);
+    img.draw_rectangle(0, size - 11, 5, size - 9, RESERVED);
 }
 
-void draw_alignment_pattern(CImg<unsigned char>& img, int center_x,
-                            int center_y) {
-    draw_square(img, center_x - 2, center_y - 2, 5, BLACK);
-    draw_square(img, center_x - 1, center_y - 1, 3, WHITE);
-    img.atXY(center_x, center_y) = 0;
+void reserve_finder_patterns(CImg<unsigned char>& img, size_t size) {
+    img.draw_rectangle(0, 0, 8, 8, RESERVED);
+    img.draw_rectangle(size - 8, 0, size - 1, 8, RESERVED);
+    img.draw_rectangle(0, size - 8, 8, size - 1, RESERVED);
 }
 
-void draw_alignment_patterns(CImg<unsigned char>& img, size_t size,
-                             int version) {
+void reserve_timing_patterns(CImg<unsigned char>& img, size_t size) {
+    img.draw_line(8, 6, size - 8, 6, RESERVED);
+    img.draw_line(6, 8, 6, size - 8, RESERVED);
+}
+
+void reserve_alignment_patterns(CImg<unsigned char>& img, size_t size,
+                                int version) {
     auto indices = qr::VERSION_TO_ALIGNMENT_PATTERN_LOCATIONS[version];
     for (const auto& x : indices) {
         if (x == 0)
@@ -67,52 +70,18 @@ void draw_alignment_patterns(CImg<unsigned char>& img, size_t size,
                 continue;
             if (!(x < 10 && y < 10) && !(x > size - 10 && y < 10) &&
                 !(x < 10 && y > size - 10)) {
-                draw_alignment_pattern(img, x, y);
+                img.draw_rectangle(x - 2, y - 2, x + 2, y + 2, RESERVED);
             }
         }
     }
 }
 
-void draw_timing_patterns(CImg<unsigned char>& img, size_t size) {
-    for (int x = 8; x < size - 8; x++) {
-        img.atXY(x, 6) = x % 2 == 0 ? BLACK[0] : WHITE[0];
-    }
-    for (int y = 8; y < size - 8; y++) {
-        img.atXY(6, y) = y % 2 == 0 ? BLACK[0] : WHITE[0];
-    }
-}
-
-void draw_function_patterns(CImg<unsigned char>& img, size_t size,
-                            int version) {
-    draw_finder_pattern(img, 0, 0);
-    img.draw_line(0, 7, 7, 7, WHITE);
-    img.draw_line(7, 0, 7, 7, WHITE);
-
-    draw_finder_pattern(img, size - 7, 0);
-    img.draw_line(size - 8, 0, size - 8, 7, WHITE);
-    img.draw_line(size - 1, 7, size - 8, 7, WHITE);
-
-    draw_finder_pattern(img, 0, size - 7);
-    img.draw_line(0, size - 8, 7, size - 8, WHITE);
-    img.draw_line(7, size - 8, 7, size - 1, WHITE);
-
-    draw_alignment_patterns(img, size, version);
-    draw_timing_patterns(img, size);
-    img.atXY(8, size - 8) = 0;
-}
-
-void reserve_area(CImg<unsigned char>& img, size_t size) {
-    img.draw_line(0, 8, 5, 8, RESERVED);
-    img.atXY(7, 8) = RESERVED[0];
-    img.atXY(8, 8) = RESERVED[0];
-    img.atXY(8, 7) = RESERVED[0];
-    img.draw_line(8, 0, 8, 5, RESERVED);
-
-    img.draw_line(size - 8, 8, size - 1, 8, RESERVED);
-    img.draw_line(8, size - 7, 8, size - 1, RESERVED);
-
-    img.draw_rectangle(size - 11, 0, size - 9, 5, RESERVED);
-    img.draw_rectangle(0, size - 11, 5, size - 9, RESERVED);
+void reserve_area(CImg<unsigned char>& img, size_t size, int version) {
+    reserve_finder_patterns(img, size);
+    reserve_timing_patterns(img, size);
+    reserve_alignment_patterns(img, size, version);
+    reserve_separators(img, size);
+    reserve_version_information(img, size);
 }
 
 unsigned char get_bit_color(bool bit) { return bit ? BLACK[0] : WHITE[0]; }
@@ -155,6 +124,10 @@ void draw_data_bits(CImg<unsigned char>& img, const std::vector<bool>& data,
         }
         place_right = !place_right;
     }
+
+    std::cout << "i: " << i << std::endl;
+    std::cout << "data.size(): " << data.size() << std::endl;
+    assert(i == data.size());
 }
 
 CImg<unsigned char> generate_qr(const std::string& data,
@@ -165,11 +138,11 @@ CImg<unsigned char> generate_qr(const std::string& data,
     auto data_codewords = encode_data(data, encoding_mode, version, ec_level);
     auto codewords = assemble_data_codewords(data_codewords, version, ec_level);
     auto data_bits = serialize_codewords_to_bits_and_pad(codewords, version);
-
     int modules = version * 4 + 17;
+
     CImg<unsigned char> img(modules, modules, 1, 1, EMPTY[0]);
-    draw_function_patterns(img, modules, version);
-    reserve_area(img, modules);
+    reserve_area(img, modules, version);
     draw_data_bits(img, data_bits, modules);
-    return img;
+    auto masked_img = get_best_data_mask(img, version);
+    return masked_img.img;
 }
