@@ -81,7 +81,9 @@ void reserve_area(CImg<unsigned char>& img, size_t size, int version) {
     reserve_timing_patterns(img, size);
     reserve_alignment_patterns(img, size, version);
     reserve_separators(img, size);
-    reserve_version_information(img, size);
+    if (version >= 7) {
+        reserve_version_information(img, size);
+    }
 }
 
 unsigned char get_bit_color(bool bit) { return bit ? BLACK[0] : WHITE[0]; }
