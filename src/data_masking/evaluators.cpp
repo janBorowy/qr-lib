@@ -39,9 +39,9 @@ int evaluate_second_rule(const CImg<unsigned char>& img) {
     int penalty = 0;
     for (int row = 0; row < img.height() - 1; row++) {
         for (int col = 0; col < img.width() - 1; col++) {
-            if (img.atXY(row, col) == img.atXY(row, col + 1) &&
-                img.atXY(row, col) == img.atXY(row + 1, col) &&
-                img.atXY(row, col) == img.atXY(row + 1, col + 1)) {
+            if (img.atXY(col, row) == img.atXY(col + 1, row) &&
+                img.atXY(col, row) == img.atXY(col, row + 1) &&
+                img.atXY(col, row) == img.atXY(col + 1, row + 1)) {
                 penalty += 3;
             }
         }

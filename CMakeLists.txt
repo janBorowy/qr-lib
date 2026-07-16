@@ -16,7 +16,8 @@ add_subdirectory(lib/Catch2)
 add_executable(qr-lib-tests test/data_encoding_tests.cpp
 			    test/ec_generation_tests.cpp
 			    test/assembly_tests.cpp
-		            test/qr_matrix_evaluation_tests.cpp)
+		            test/qr_matrix_evaluation_tests.cpp
+		            test/data_masking_tests.cpp)
 
 target_compile_definitions(qr-lib-tests PRIVATE cimg_display=0)
 
@@ -29,8 +30,10 @@ src/steps/error_correction/generator_polynomial.cpp
 src/steps/error_correction/ec_generation.cpp
 src/steps/codewords_assembly.cpp
 src/data_masking/data_mask_resolver.cpp
-src/data_masking/qr_matrix_evaluator.cpp
 src/data_masking/evaluators.cpp
+src/qr_code_generator.cpp
+src/qr_function_patterns.cpp
+src/debug.cpp
 )
 
 add_executable(qr-lib-demo src/main.cpp)
@@ -40,10 +43,11 @@ src/steps/error_correction/gf_polynomial.cpp
 src/steps/error_correction/generator_polynomial.cpp
 src/steps/error_correction/ec_generation.cpp
 src/steps/codewords_assembly.cpp
-src/qr_code_generator.cpp
-src/data_masking/qr_matrix_evaluator.cpp
 src/data_masking/evaluators.cpp
 src/data_masking/data_mask_resolver.cpp
+src/qr_code_generator.cpp
+src/qr_function_patterns.cpp
+src/debug.cpp
 )
 
 find_package(X11 REQUIRED)

@@ -1,9 +1,9 @@
 #include "../lib/CImg/CImg.h"
 #include "../src/data_masking/evaluators.h"
-#include "../src/data_masking/qr_matrix_evaluator.h"
 #include "../src/qr_color_constants.h"
 
 #include "catch2/catch_test_macros.hpp"
+#include <numeric>
 
 using namespace cimg_library;
 
@@ -151,5 +151,8 @@ const CImg<unsigned char> SAMPLE_MATRIX(
     },
     21, 21);
 TEST_CASE("All evaluators against sample qr") {
-    REQUIRE(evaluate_data_mask(SAMPLE_MATRIX) == 350);
+    int penalty = std::accumulate(
+        QR_EVALUATORS.begin(), QR_EVALUATORS.end(), 0,
+        [](int p, auto eval) { return p + eval(SAMPLE_MATRIX); });
+    REQUIRE(penalty == 350);
 }
