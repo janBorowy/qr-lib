@@ -31,4 +31,5 @@ class GFPolynomial {
 };
 
 GFPolynomial reed_solomon_divide(const GFPolynomial& message_poly,
-                                 const GFPolynomial& generator_poly);
+                                 const GFPolynomial& generator_poly,
+                                 int terms_num);

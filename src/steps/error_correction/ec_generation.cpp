@@ -1,6 +1,8 @@
 #include "ec_generation.h"
 #include "generator_polynomial.h"
 #include "gf_polynomial.h"
+#include <cassert>
+#include <iostream>
 #include <vector>
 
 // GFPolynomial data_to_polynomial(const std::vector<bool>& data) {
@@ -47,9 +49,10 @@ generate_ec_codewords(const std::vector<qr::Codeword>& data,
     int terms_num = data.size();
     message_poly.add_all_exp(ec_codewords_num);
     auto generator_poly = get_generator_polynomial(ec_codewords_num);
-    // TODO: make sure about this(that we multiply by the correct numer here)
     generator_poly.add_all_exp(terms_num - 1);
 
-    auto division_result = reed_solomon_divide(message_poly, generator_poly);
+    auto division_result =
+        reed_solomon_divide(message_poly, generator_poly, terms_num);
+    assert(ec_codewords_num == division_result.get_word_count());
     return polynomial_to_codewords(division_result);
 }

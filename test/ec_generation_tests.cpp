@@ -80,5 +80,11 @@ TEST_CASE("Calculates error codewords", "[ec_generation]") { // HELLO WORLD
             std::vector<unsigned char>{140, 100, 250, 247, 108, 131, 37, 104,
                                        253, 113, 111, 235, 197, 83, 6, 205, 89,
                                        74});
-}
 
+    // "Hello"
+    REQUIRE(generate_ec_codewords({64, 84, 134, 86, 0xc6, 0xc6, 0xf0, 0x11,
+                                   0xec, 0x11, 0xec, 0x11, 0xec},
+                                  13) ==
+            std::vector<unsigned char>{211, 79, 219, 65, 102, 100, 29, 1, 97,
+                                       54, 192, 4, 66});
+}

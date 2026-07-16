@@ -76,14 +76,17 @@ GFPolynomial xor_poly_values(const GFPolynomial& first,
 }
 
 GFPolynomial reed_solomon_divide(const GFPolynomial& message_poly,
-                                 const GFPolynomial& generator_poly) {
+                                 const GFPolynomial& generator_poly,
+                                 int terms_num) {
     GFPolynomial dividend(message_poly);
     GFPolynomial divisor(generator_poly);
-    for (int i = 0; i < message_poly.get_word_count(); i++) {
+    int current_exp = message_poly.get_highest_exp();
+    for (int i = 0; i < terms_num; i++) {
         GFPolynomial current_div(divisor);
-        current_div.multiply(dividend[dividend.get_highest_exp()]);
+        current_div.multiply(dividend[current_exp]);
         dividend = xor_poly_values(dividend, current_div);
         divisor.subtract_all_exp(1);
+        current_exp--;
     }
     return dividend;
 }
