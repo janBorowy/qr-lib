@@ -6,6 +6,7 @@
 #include "steps/data_analysis.h"
 #include "steps/data_encoding.h"
 #include "steps/qr.h"
+#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <cstddef>
@@ -127,9 +128,33 @@ void draw_data_bits(CImg<unsigned char>& img, const std::vector<bool>& data,
         place_right = !place_right;
     }
 
-    std::cout << "i: " << i << std::endl;
-    std::cout << "data.size(): " << data.size() << std::endl;
     assert(i == data.size());
+}
+
+void draw_format_string(CImg<unsigned char>& img,
+                        qr::ErrorCorrectionLevel ec_level, unsigned char mask) {
+    auto bits = qr::EC_AND_MASK_TO_FORMAT_STRING.at(ec_level)[mask];
+    for (int col = 0; col < 6; col++) {
+        img(col, 8) = get_bit_color(bits[col]);
+    }
+    img(7, 8) = get_bit_color(bits[6]);
+    img(8, 8) = get_bit_color(bits[7]);
+    img(8, 7) = get_bit_color(bits[8]);
+    for (int row = 5; row >= 0; row--) {
+        img(8, row) = get_bit_color(bits[14 - row]);
+    }
+
+    for (int row = img.height() - 1; row >= img.height() - 7; row--) {
+        img(8, row) = get_bit_color(bits[img.height() - row - 1]);
+    }
+
+    for (int col = img.width() - 8; col < img.width(); col++) {
+        img(col, 8) = get_bit_color(bits[col + 15 - img.width()]);
+    }
+}
+
+void draw_version_string(CImg<unsigned char>& img, int version) {
+    auto bits = qr::VERSION_TO_VERSION_STRING[version];
 }
 
 CImg<unsigned char> generate_qr(const std::string& data,
@@ -146,5 +171,7 @@ CImg<unsigned char> generate_qr(const std::string& data,
     reserve_area(img, modules, version);
     draw_data_bits(img, data_bits, modules);
     auto masked_img = get_best_data_mask(img, version);
+    draw_format_string(masked_img.img, ec_level, masked_img.mask);
+    draw_version_string(masked_img.img, version);
     return masked_img.img;
 }

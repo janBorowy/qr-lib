@@ -88,3 +88,4 @@ TEST_CASE("Calculates error codewords", "[ec_generation]") { // HELLO WORLD
             std::vector<unsigned char>{211, 79, 219, 65, 102, 100, 29, 1, 97,
                                        54, 192, 4, 66});
 }
+

@@ -4,7 +4,7 @@
 using namespace cimg_library;
 
 struct MaskedImage {
-    const CImg<unsigned char> img;
+    CImg<unsigned char> img;
     unsigned char mask;
 };
 

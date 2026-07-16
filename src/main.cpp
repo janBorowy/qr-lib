@@ -12,7 +12,7 @@ int main() {
     // auto qr = generate_qr("Hello, world!", qr::Q);
 
     // ver 1
-    auto qr = generate_qr("Hello", qr::Q);
+    auto qr = generate_qr("Kocham Werke", qr::Q);
     qr.display("Your qr code");
     return 0;
 }
