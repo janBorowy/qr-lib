@@ -34,6 +34,7 @@ src/module_placement/qr_function_patterns.cpp
 src/data_masking/data_mask_resolver.cpp
 src/data_masking/evaluators.cpp
 src/qr_code_generator.cpp
+src/qrlib.cpp
 )
 target_sources(qr-lib-tests PRIVATE ${CPP_SOURCE_FILES}
 src/test/test_utils.cpp

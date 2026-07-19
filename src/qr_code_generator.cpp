@@ -1,7 +1,6 @@
 #include "qr_code_generator.h"
 #include "data_masking/data_mask_resolver.h"
 #include "message_encoding/codewords_assembly.h"
-#include "message_encoding/data_analysis.h"
 #include "message_encoding/data_encoding.h"
 #include "module_placement/qr_function_patterns.h"
 #include "qr.h"
@@ -174,10 +173,9 @@ void draw_version_string(CImg<unsigned char>& img, int version) {
 }
 
 CImg<unsigned char> generate_qr(const std::string& data,
-                                qr::ErrorCorrectionLevel ec_level) {
-    auto encoding_mode = analyze_encoding_mode(data);
-    auto version =
-        determine_smallest_version(data.size(), encoding_mode, ec_level);
+                                qr::ErrorCorrectionLevel ec_level,
+                                qr::EncodingMode encoding_mode, int version,
+                                int mask) {
     auto data_codewords = encode_data(data, encoding_mode, version, ec_level);
     auto codewords = assemble_data_codewords(data_codewords, version, ec_level);
     auto data_bits = serialize_codewords_to_bits_and_pad(codewords, version);
@@ -186,8 +184,15 @@ CImg<unsigned char> generate_qr(const std::string& data,
     CImg<unsigned char> img(modules, modules, 1, 1, EMPTY[0]);
     reserve_area(img, modules, version);
     draw_data_bits(img, data_bits, modules);
-    auto masked_img = get_best_data_mask(img, version);
-    draw_format_string(masked_img.img, ec_level, masked_img.mask);
-    draw_version_string(masked_img.img, version);
-    return masked_img.img;
+    CImg<unsigned char> masked_img;
+    if (mask < 0 || mask > 7) {
+        auto masking_result = get_best_data_mask(img, version);
+        masked_img = masking_result.img;
+        mask = masking_result.mask;
+    } else {
+        masked_img = mask_data(img, version, mask);
+    }
+    draw_format_string(masked_img, ec_level, mask);
+    draw_version_string(masked_img, version);
+    return masked_img;
 }

@@ -9,3 +9,5 @@ struct MaskedImage {
 };
 
 MaskedImage get_best_data_mask(const CImg<unsigned char>& img, int version);
+CImg<unsigned char> mask_data(const CImg<unsigned char>& img, int version,
+                              int mask);

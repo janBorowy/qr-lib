@@ -155,3 +155,4 @@ TEST_CASE("Terminator is appended correctly", "[data_encoding]") {
                          "10110111000 10011010100  01001010110 01001010110 "
                          "01001010110 000"));
 }
+

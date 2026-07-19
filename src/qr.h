@@ -3,9 +3,9 @@
 #include <array>
 #include <unordered_map>
 #include <vector>
+#include "qrlib.h"
 
 namespace qr {
-enum ErrorCorrectionLevel { L, M, Q, H };
 enum EncodingMode { NUMERIC, ALPHANUMERIC, BYTE };
 constexpr int VERSIONS_AVAILABLE = 40;
 

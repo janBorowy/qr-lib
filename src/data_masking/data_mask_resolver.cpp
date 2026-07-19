@@ -40,13 +40,25 @@ CImg<unsigned char> mask_img(const CImg<unsigned char>& img, DataMask mask) {
     return masked_img;
 }
 
-int evalute_img(const CImg<unsigned char>& img) {
-    return std::accumulate(
-        QR_EVALUATORS.cbegin(), QR_EVALUATORS.cend(), 0,
-        [&img](auto p, auto evaluator) { return p + evaluator(img); });
+CImg<unsigned char> make_reserved_areas_white(const CImg<unsigned char>& img) {
+    auto result = img;
+    for (int row = 0; row < img.height(); row++) {
+        for (int col = 0; col < img.width(); col++) {
+            if (result(col, row) == RESERVED[0]) {
+                result(col, row) = WHITE[0];
+            }
+        }
+    }
+    return result;
 }
 
-// TODO: exclude reserved format and version areas from evaluation
+int evalute_img(const CImg<unsigned char>& img) {
+    auto img_for_evaluation = make_reserved_areas_white(img);
+    return std::accumulate(QR_EVALUATORS.cbegin(), QR_EVALUATORS.cend(), 0,
+                           [&img_for_evaluation](auto p, auto evaluator) {
+                               return p + evaluator(img_for_evaluation);
+                           });
+}
 
 MaskedImage get_best_data_mask(const CImg<unsigned char>& img, int version) {
     std::vector<CImg<unsigned char>> masked_imgs;
@@ -56,12 +68,17 @@ MaskedImage get_best_data_mask(const CImg<unsigned char>& img, int version) {
     }
     std::for_each(masked_imgs.begin(), masked_imgs.end(),
                   [&version](auto& i) { draw_function_patterns(i, version); });
-    CImg img_with_patterns(img);
-    draw_function_patterns(img_with_patterns, version);
     for (const auto& masked_img : masked_imgs) {
         penalties.push_back(evalute_img(masked_img));
     }
     auto smallest = std::min_element(penalties.begin(), penalties.end());
     unsigned char smallest_idx = std::distance(penalties.begin(), smallest);
     return {.img = masked_imgs[smallest_idx], .mask = smallest_idx};
+}
+
+CImg<unsigned char> mask_data(const CImg<unsigned char>& img, int version,
+                              int mask) {
+    CImg result(mask_img(img, DATA_MASKS[mask]));
+    draw_function_patterns(result, version);
+    return result;
 }

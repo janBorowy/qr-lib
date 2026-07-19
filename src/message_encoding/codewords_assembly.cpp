@@ -51,8 +51,7 @@ std::vector<qr::Codeword> interleave(const std::vector<Block>& blocks) {
         for (auto& [it, end] : data_iterators) {
             if (it != end) {
                 result.push_back(*it++);
-            }
-        }
+            } }
     }
 
     while (std::any_of(ec_iterators.begin(), ec_iterators.end(),
