@@ -1,6 +1,6 @@
-#include "../lib/CImg/CImg.h"
-#include "../src/data_masking/evaluators.h"
-#include "../src/qr_color_constants.h"
+#include "../../lib/CImg/CImg.h"
+#include "../data_masking/evaluators.h"
+#include "../qr_color_constants.h"
 
 #include "catch2/catch_test_macros.hpp"
 #include <numeric>

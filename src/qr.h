@@ -9,7 +9,6 @@ enum ErrorCorrectionLevel { L, M, Q, H };
 enum EncodingMode { NUMERIC, ALPHANUMERIC, BYTE };
 constexpr int VERSIONS_AVAILABLE = 40;
 
-// TODO: fill this, L and M only for now and up to 10 verions
 const std::unordered_map<ErrorCorrectionLevel,
                          std::unordered_map<EncodingMode, std::vector<int>>>
     VERSION_CAPACITIES = {
@@ -523,49 +522,50 @@ const std::unordered_map<ErrorCorrectionLevel, std::array<FormatString, 8>>
          }}},
 };
 
-constexpr std::array<VersionString, VERSIONS_AVAILABLE + 1> VERSION_TO_VERSION_STRING = {{
-    str_to_bits("000000000000000000"), // 0
-    str_to_bits("000000000000000000"), // 1
-    str_to_bits("000000000000000000"), // 2
-    str_to_bits("000000000000000000"), // 3
-    str_to_bits("000000000000000000"), // 4
-    str_to_bits("000000000000000000"), // 5
-    str_to_bits("000000000000000000"), // 6
-    str_to_bits("000111110010010100"), // 7
-    str_to_bits("001000010110111100"), // 8
-    str_to_bits("001001101010011001"), // 9
-    str_to_bits("001010010011010011"), // 10
-    str_to_bits("001011101111110110"), // 11
-    str_to_bits("001100011101100010"), // 12
-    str_to_bits("001101100001000111"), // 13
-    str_to_bits("001110011000001101"), // 14
-    str_to_bits("001111100100101000"), // 15
-    str_to_bits("010000101101111000"), // 16
-    str_to_bits("010001010001011101"), // 17
-    str_to_bits("010010101000010111"), // 18
-    str_to_bits("010011010100110010"), // 19
-    str_to_bits("010100100110100110"), // 20
-    str_to_bits("010101011010000011"), // 21
-    str_to_bits("010110100011001001"), // 22
-    str_to_bits("010111011111101100"), // 23
-    str_to_bits("011000111011000100"), // 24
-    str_to_bits("011001000111100001"), // 25
-    str_to_bits("011010111110101011"), // 26
-    str_to_bits("011011000010001110"), // 27
-    str_to_bits("011100110000011010"), // 28
-    str_to_bits("011101001100111111"), // 29
-    str_to_bits("011110110101110101"), // 30
-    str_to_bits("011111001001010000"), // 31
-    str_to_bits("100000100111010101"), // 32
-    str_to_bits("100001011011110000"), // 33
-    str_to_bits("100010100010111010"), // 34
-    str_to_bits("100011011110011111"), // 35
-    str_to_bits("100100101100001011"), // 36
-    str_to_bits("100101010000101110"), // 37
-    str_to_bits("100110101001100100"), // 38
-    str_to_bits("100111010101000001"), // 39
-    str_to_bits("101000110001101001")  // 40
-}};
+constexpr std::array<VersionString, VERSIONS_AVAILABLE + 1>
+    VERSION_TO_VERSION_STRING = {{
+        str_to_bits("000000000000000000"), // 0
+        str_to_bits("000000000000000000"), // 1
+        str_to_bits("000000000000000000"), // 2
+        str_to_bits("000000000000000000"), // 3
+        str_to_bits("000000000000000000"), // 4
+        str_to_bits("000000000000000000"), // 5
+        str_to_bits("000000000000000000"), // 6
+        str_to_bits("000111110010010100"), // 7
+        str_to_bits("001000010110111100"), // 8
+        str_to_bits("001001101010011001"), // 9
+        str_to_bits("001010010011010011"), // 10
+        str_to_bits("001011101111110110"), // 11
+        str_to_bits("001100011101100010"), // 12
+        str_to_bits("001101100001000111"), // 13
+        str_to_bits("001110011000001101"), // 14
+        str_to_bits("001111100100101000"), // 15
+        str_to_bits("010000101101111000"), // 16
+        str_to_bits("010001010001011101"), // 17
+        str_to_bits("010010101000010111"), // 18
+        str_to_bits("010011010100110010"), // 19
+        str_to_bits("010100100110100110"), // 20
+        str_to_bits("010101011010000011"), // 21
+        str_to_bits("010110100011001001"), // 22
+        str_to_bits("010111011111101100"), // 23
+        str_to_bits("011000111011000100"), // 24
+        str_to_bits("011001000111100001"), // 25
+        str_to_bits("011010111110101011"), // 26
+        str_to_bits("011011000010001110"), // 27
+        str_to_bits("011100110000011010"), // 28
+        str_to_bits("011101001100111111"), // 29
+        str_to_bits("011110110101110101"), // 30
+        str_to_bits("011111001001010000"), // 31
+        str_to_bits("100000100111010101"), // 32
+        str_to_bits("100001011011110000"), // 33
+        str_to_bits("100010100010111010"), // 34
+        str_to_bits("100011011110011111"), // 35
+        str_to_bits("100100101100001011"), // 36
+        str_to_bits("100101010000101110"), // 37
+        str_to_bits("100110101001100100"), // 38
+        str_to_bits("100111010101000001"), // 39
+        str_to_bits("101000110001101001")  // 40
+    }};
 
 typedef unsigned char Codeword;
 } // namespace qr

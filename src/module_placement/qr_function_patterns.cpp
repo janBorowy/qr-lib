@@ -1,6 +1,6 @@
 #include "qr_function_patterns.h"
-#include "qr_color_constants.h"
-#include "steps/qr.h"
+#include "../qr.h"
+#include "../qr_color_constants.h"
 
 void draw_square(CImg<unsigned char>& img, int x, int y, int s,
                  const unsigned char color[3]) {

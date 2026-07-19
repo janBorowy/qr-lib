@@ -1,6 +1,6 @@
 #include "data_mask_resolver.h"
+#include "../module_placement/qr_function_patterns.h"
 #include "../qr_color_constants.h"
-#include "../qr_function_patterns.h"
 #include "evaluators.h"
 #include <algorithm>
 #include <cstdio>

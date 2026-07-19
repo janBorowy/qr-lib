@@ -1,6 +1,6 @@
-#include "../src/exceptions/max_capacity_exceeded.h"
-#include "../src/steps/data_analysis.h"
-#include "../src/steps/data_encoding.h"
+#include "../exceptions/max_capacity_exceeded.h"
+#include "../message_encoding/data_analysis.h"
+#include "../message_encoding/data_encoding.h"
 #include "test_utils.h"
 
 #include <bitset>

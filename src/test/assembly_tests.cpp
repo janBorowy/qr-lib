@@ -1,5 +1,5 @@
-#include "../src/steps/codewords_assembly.h"
-#include "../src/steps/qr.h"
+#include "../message_encoding/codewords_assembly.h"
+#include "../qr.h"
 #include "catch2/catch_test_macros.hpp"
 #include <vector>
 

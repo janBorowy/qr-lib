@@ -1,6 +1,6 @@
 #include "codewords_assembly.h"
+#include "../qr.h"
 #include "error_correction/ec_generation.h"
-#include "qr.h"
 #include <algorithm>
 #include <cassert>
 #include <vector>

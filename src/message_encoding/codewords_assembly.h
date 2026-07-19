@@ -1,5 +1,5 @@
 #pragma once
-#include "qr.h"
+#include "../qr.h"
 #include <vector>
 
 std::vector<qr::Codeword>

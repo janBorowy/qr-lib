@@ -1,6 +1,6 @@
 #pragma once
 
-#include "qr.h"
+#include "../qr.h"
 
 #include <cstddef>
 #include <string>

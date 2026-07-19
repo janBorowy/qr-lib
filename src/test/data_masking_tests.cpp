@@ -1,5 +1,5 @@
-#include "../src/data_masking/data_mask_resolver.h"
-#include "../src/qr_color_constants.h"
+#include "../data_masking/data_mask_resolver.h"
+#include "../qr_color_constants.h"
 #include "catch2/catch_test_macros.hpp"
 
 using namespace cimg_library;

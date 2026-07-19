@@ -1,5 +1,5 @@
+#include "qr.h"
 #include "qr_code_generator.h"
-#include "steps/qr.h"
 
 using cimg_library::CImg;
 

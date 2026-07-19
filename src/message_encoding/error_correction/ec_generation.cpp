@@ -2,27 +2,7 @@
 #include "generator_polynomial.h"
 #include "gf_polynomial.h"
 #include <cassert>
-#include <iostream>
 #include <vector>
-
-// GFPolynomial data_to_polynomial(const std::vector<bool>& data) {
-//     GFPolynomial result;
-//     int current_value = 0;
-//     int bytes = data.size() / 8;
-//     for (int byte = 0; byte < bytes; byte++) {
-//         int bytes_remaining = bytes - byte;
-//         for (auto it = data.rbegin() + 8 * (bytes_remaining - 1);
-//              it < data.rbegin() + 8 * bytes_remaining; it++) {
-//             if (*it) {
-//                 current_value +=
-//                     1 << (it - (data.rbegin() + 8 * (bytes_remaining - 1)));
-//             }
-//         }
-//         result.set_coef(bytes_remaining - 1, current_value);
-//         current_value = 0;
-//     }
-//     return result;
-// }
 
 GFPolynomial codewords_to_polynomial(const std::vector<qr::Codeword>& data) {
     GFPolynomial result;

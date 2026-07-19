@@ -1,7 +1,7 @@
-#include "../src/steps/error_correction/alpha_notation_conversion.h"
-#include "../src/steps/error_correction/ec_generation.h"
-#include "../src/steps/error_correction/generator_polynomial.h"
-#include "../src/steps/error_correction/gf_polynomial.h"
+#include "../message_encoding/error_correction/alpha_notation_conversion.h"
+#include "../message_encoding/error_correction/ec_generation.h"
+#include "../message_encoding/error_correction/generator_polynomial.h"
+#include "../message_encoding/error_correction/gf_polynomial.h"
 #include "catch2/catch_test_macros.hpp"
 
 TEST_CASE("Generates alpha conversion table", "[alpha_conv]") {
@@ -88,4 +88,3 @@ TEST_CASE("Calculates error codewords", "[ec_generation]") { // HELLO WORLD
             std::vector<unsigned char>{211, 79, 219, 65, 102, 100, 29, 1, 97,
                                        54, 192, 4, 66});
 }
-

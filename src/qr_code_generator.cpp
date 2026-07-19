@@ -1,11 +1,11 @@
 #include "qr_code_generator.h"
 #include "data_masking/data_mask_resolver.h"
+#include "message_encoding/codewords_assembly.h"
+#include "message_encoding/data_analysis.h"
+#include "message_encoding/data_encoding.h"
+#include "module_placement/qr_function_patterns.h"
+#include "qr.h"
 #include "qr_color_constants.h"
-#include "qr_function_patterns.h"
-#include "steps/codewords_assembly.h"
-#include "steps/data_analysis.h"
-#include "steps/data_encoding.h"
-#include "steps/qr.h"
 #include <bitset>
 #include <cassert>
 #include <cstddef>

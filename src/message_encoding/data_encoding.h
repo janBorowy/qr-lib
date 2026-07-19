@@ -1,4 +1,4 @@
-#include "qr.h"
+#include "../qr.h"
 #include <string>
 #include <vector>
 constexpr int MODE_INDICATOR_SIZE = 4;

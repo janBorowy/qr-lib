@@ -1,5 +1,5 @@
 #include "data_encoding.h"
-#include "qr.h"
+#include "../qr.h"
 #include <algorithm>
 #include <bitset>
 #include <vector>

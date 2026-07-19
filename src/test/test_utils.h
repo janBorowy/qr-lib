@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/steps/qr.h"
+#include "../qr.h"
 #include <string>
 #include <vector>
 
