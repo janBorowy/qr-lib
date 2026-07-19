@@ -6,12 +6,10 @@
 #include "steps/data_analysis.h"
 #include "steps/data_encoding.h"
 #include "steps/qr.h"
-#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
 #include <vector>
 
 using namespace cimg_library;
@@ -154,7 +152,25 @@ void draw_format_string(CImg<unsigned char>& img,
 }
 
 void draw_version_string(CImg<unsigned char>& img, int version) {
+    if (version < 7)
+        return;
     auto bits = qr::VERSION_TO_VERSION_STRING[version];
+    auto it = bits.rbegin();
+    for (int col = 0; col < 6; col++) {
+        for (int row = img.height() - 11; row <= img.height() - 9; row++) {
+            img(col, row) = get_bit_color(*it++);
+        }
+    }
+
+    assert(it == bits.rend());
+    it = bits.rbegin();
+
+    for (int row = 0; row < 6; row++) {
+        for (int col = img.width() - 11; col <= img.width() - 9; col++) {
+            img(col, row) = get_bit_color(*it++);
+        }
+    }
+    assert(it == bits.rend());
 }
 
 CImg<unsigned char> generate_qr(const std::string& data,

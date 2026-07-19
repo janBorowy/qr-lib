@@ -27,7 +27,6 @@ class GFPolynomial {
     void reed_solomon_divide(const GFPolynomial& generator_poly,
                              GFPolynomial& reminder) const;
     unsigned char get_highest_exp() const;
-    unsigned char get_word_count() const;
 };
 
 GFPolynomial reed_solomon_divide(const GFPolynomial& message_poly,

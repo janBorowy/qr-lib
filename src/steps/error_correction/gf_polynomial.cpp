@@ -60,8 +60,6 @@ unsigned char GFPolynomial::get_highest_exp() const {
     return coefs.begin()->first;
 }
 
-unsigned char GFPolynomial::get_word_count() const { return coefs.size(); }
-
 GFPolynomial xor_poly_values(const GFPolynomial& first,
                              const GFPolynomial& second) {
 

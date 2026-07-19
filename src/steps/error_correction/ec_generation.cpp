@@ -34,9 +34,9 @@ GFPolynomial codewords_to_polynomial(const std::vector<qr::Codeword>& data) {
 }
 
 std::vector<qr::Codeword>
-polynomial_to_codewords(const GFPolynomial& polynomial) {
+polynomial_to_codewords(const GFPolynomial& polynomial, int terms_num) {
     std::vector<qr::Codeword> result;
-    for (int i = polynomial.get_highest_exp(); i >= 0; i--) {
+    for (int i = terms_num - 1; i >= 0; i--) {
         result.push_back(polynomial[i]);
     }
     return result;
@@ -53,6 +53,5 @@ generate_ec_codewords(const std::vector<qr::Codeword>& data,
 
     auto division_result =
         reed_solomon_divide(message_poly, generator_poly, terms_num);
-    assert(ec_codewords_num == division_result.get_word_count());
-    return polynomial_to_codewords(division_result);
+    return polynomial_to_codewords(division_result, ec_codewords_num);
 }
