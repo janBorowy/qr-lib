@@ -24,7 +24,7 @@ std::string hex_to_bytes(std::vector<unsigned char> hex) {
 }
 
 std::string alternate_padding(int n) {
-    auto is_even = false;
+    auto is_even = true;
     std::string result;
     for (int i = 0; i < n; i++) {
         if (is_even) {
@@ -137,6 +137,19 @@ TEST_CASE("Encodes byte data correctly", "[data_encoding]") {
                          hex_to_bytes({0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20,
                                        0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21}) +
                          "0000" + alternate_padding(4)));
+    REQUIRE(
+        encode_data("https://www.youtube.com/watch?v=xR-E2pwgFJo",
+                    EncodingMode::BYTE, 3, ErrorCorrectionLevel::L) ==
+        str_to_codewords("0100 00101011"
+                         "01101000 01110100 01110100 01110000 01110011 00111010"
+                         "00101111 00101111 01110111 01110111 01110111 00101110"
+                         "01111001 01101111 01110101 01110100 01110101 01100010"
+                         "01100101 00101110 01100011 01101111 01101101 00101111"
+                         "01110111 01100001 01110100 01100011 01101000 00111111"
+                         "01110110 00111101 01111000 01010010 00101101 01000101"
+                         "00110010 01110000 01110111 01100111 01000110 01001010"
+                         "01101111 0000" +
+                         alternate_padding(10)));
 }
 
 TEST_CASE("Terminator is appended correctly", "[data_encoding]") {
@@ -155,4 +168,3 @@ TEST_CASE("Terminator is appended correctly", "[data_encoding]") {
                          "10110111000 10011010100  01001010110 01001010110 "
                          "01001010110 000"));
 }
-

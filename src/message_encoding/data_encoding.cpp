@@ -147,9 +147,9 @@ void encode_terminator_and_padding(const std::string& data,
     auto is_even = false;
     while (result.size() < data_bits) {
         if (is_even) {
-            push_back_bits<8>(8, std::bitset<8>{"11101100"}, result);
-        } else {
             push_back_bits<8>(8, std::bitset<8>{"00010001"}, result);
+        } else {
+            push_back_bits<8>(8, std::bitset<8>{"11101100"}, result);
         }
         is_even = !is_even;
     }
