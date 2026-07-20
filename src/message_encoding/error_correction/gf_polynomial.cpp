@@ -35,6 +35,9 @@ void substract(const GFPolynomial& first, const GFPolynomial& second,
 }
 
 unsigned char gf_multiplication(unsigned char a, unsigned char b) {
+    if (a == 0 || b == 0) {
+        return 0;
+    }
     return ALPHA_TO_INT[(INT_TO_ALPHA[a] + INT_TO_ALPHA[b]) % 255];
 }
 

@@ -13,8 +13,10 @@ int main() {
 
     // ver 1
     // auto qr = generate_qr("Hello", qr::Q);
-    // TODO: fix this breaking! Some EC codewords are calculated incorrectly
-    auto qr = generate_qr("https://www.youtube.com/watch?v=xR-E2pwgFJo", qr::L);
+    auto qr =
+        generate_qr("https://www.youtube.com/"
+                    "watch?v=gpxy71WGzI4&list=RDgpxy71WGzI4&start_radio=1",
+                    qr::L);
     qr.display("Your qr code");
     return 0;
 }
