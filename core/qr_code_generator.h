@@ -3,8 +3,8 @@
 #include <string>
 
 #include "../lib/CImg/CImg.h"
+#include "include/qrlib.h"
 #include "qr.h"
-#include "qrlib.h"
 
 using cimg_library::CImg;
 

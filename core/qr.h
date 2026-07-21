@@ -1,9 +1,9 @@
 #pragma once
 
+#include "include/qrlib.h"
 #include <array>
 #include <unordered_map>
 #include <vector>
-#include "qrlib.h"
 
 namespace qr {
 enum EncodingMode { NUMERIC, ALPHANUMERIC, BYTE };

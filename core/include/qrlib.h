@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/CImg/CImg.h"
+#include "../../lib/CImg/CImg.h"
 #include <string>
 
 using cimg_library::CImg;
