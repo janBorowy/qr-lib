@@ -11,6 +11,8 @@ include(lib/Catch2/extras/Catch.cmake)
 project(qr-lib)
 
 add_subdirectory(lib/Catch2)
+add_subdirectory(lib/cli11)
+
 add_subdirectory(core)
 add_subdirectory(cli)
 
