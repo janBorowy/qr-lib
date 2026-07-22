@@ -1,10 +1,7 @@
 #pragma once
 
-#include "../../lib/CImg/CImg.h"
 #include "QrCode.h"
 #include <string>
-
-using cimg_library::CImg;
 
 namespace qr {
 enum ErrorCorrectionLevel { L, M, Q, H };

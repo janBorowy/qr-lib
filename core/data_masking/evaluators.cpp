@@ -3,15 +3,15 @@
 #include <algorithm>
 #include <cstdlib>
 
-int evaluate_first_rule(const CImg<unsigned char>& img) {
+int evaluate_first_rule(const MutableQrCode& qr) {
     int penalty = 0;
-    for (int row = 0; row < img.height(); row++) {
+    for (int row = 0; row < qr.size(); row++) {
         int current_color = -1;
         int counter = 0;
-        for (int col = 0; col < img.width(); col++) {
-            if (img.atXY(col, row) != current_color) {
+        for (int col = 0; col < qr.size(); col++) {
+            if (qr[col, row] != current_color) {
                 penalty += counter >= 5 ? counter - 2 : 0;
-                current_color = img.atXY(col, row);
+                current_color = qr[col, row];
                 counter = 0;
             }
             counter++;
@@ -19,13 +19,13 @@ int evaluate_first_rule(const CImg<unsigned char>& img) {
         penalty += counter >= 5 ? counter - 2 : 0;
     }
 
-    for (int col = 0; col < img.width(); col++) {
+    for (int col = 0; col < qr.size(); col++) {
         int current_color = -1;
         int counter = 0;
-        for (int row = 0; row < img.height(); row++) {
-            if (img.atXY(col, row) != current_color) {
+        for (int row = 0; row < qr.size(); row++) {
+            if (qr[col, row] != current_color) {
                 penalty += counter >= 5 ? counter - 2 : 0;
-                current_color = img.atXY(col, row);
+                current_color = qr[col, row];
                 counter = 0;
             }
             counter++;
@@ -35,13 +35,13 @@ int evaluate_first_rule(const CImg<unsigned char>& img) {
     return penalty;
 }
 
-int evaluate_second_rule(const CImg<unsigned char>& img) {
+int evaluate_second_rule(const MutableQrCode& qr) {
     int penalty = 0;
-    for (int row = 0; row < img.height() - 1; row++) {
-        for (int col = 0; col < img.width() - 1; col++) {
-            if (img.atXY(col, row) == img.atXY(col + 1, row) &&
-                img.atXY(col, row) == img.atXY(col, row + 1) &&
-                img.atXY(col, row) == img.atXY(col + 1, row + 1)) {
+    for (int row = 0; row < qr.size() - 1; row++) {
+        for (int col = 0; col < qr.size() - 1; col++) {
+            if (qr[col, row] == qr[col + 1, row] &&
+                qr[col, row] == qr[col, row + 1] &&
+                qr[col, row] == qr[col + 1, row + 1]) {
                 penalty += 3;
             }
         }
@@ -49,11 +49,11 @@ int evaluate_second_rule(const CImg<unsigned char>& img) {
     return penalty;
 }
 
-bool is_equal_horizontal(const CImg<unsigned char>& img, int x, int y,
+bool is_equal_horizontal(const MutableQrCode& qr, int x, int y,
                          std::array<unsigned char, 11> pattern) {
 
     for (const unsigned char& c : pattern) {
-        if (img(x, y) != c) {
+        if (qr[x, y] != c) {
             return false;
         }
         x++;
@@ -61,11 +61,11 @@ bool is_equal_horizontal(const CImg<unsigned char>& img, int x, int y,
     return true;
 }
 
-bool is_equal_vertical(const CImg<unsigned char>& img, int x, int y,
+bool is_equal_vertical(const MutableQrCode& qr, int x, int y,
                        std::array<unsigned char, 11> pattern) {
 
     for (const unsigned char& c : pattern) {
-        if (img(x, y) != c) {
+        if (qr[x, y] != c) {
             return false;
         }
         y++;
@@ -75,10 +75,10 @@ bool is_equal_vertical(const CImg<unsigned char>& img, int x, int y,
 
 constexpr unsigned char W = WHITE[0];
 constexpr unsigned char B = BLACK[0];
-int evaluate_third_rule(const CImg<unsigned char>& img) {
+int evaluate_third_rule(const MutableQrCode& img) {
     int penalty = 0;
-    for (int row = 0; row < img.height(); row++) {
-        for (int col = 0; col < img.width() - 10; col++) {
+    for (int row = 0; row < img.size(); row++) {
+        for (int col = 0; col < img.size() - 10; col++) {
             if (is_equal_horizontal(img, col, row,
                                     {B, W, B, B, B, W, B, W, W, W, W}) ||
                 is_equal_horizontal(img, col, row,
@@ -88,8 +88,8 @@ int evaluate_third_rule(const CImg<unsigned char>& img) {
         }
     }
 
-    for (int col = 0; col < img.width(); col++) {
-        for (int row = 0; row < img.height() - 10; row++) {
+    for (int col = 0; col < img.size(); col++) {
+        for (int row = 0; row < img.size() - 10; row++) {
             if (is_equal_vertical(img, col, row,
                                   {B, W, B, B, B, W, B, W, W, W, W}) ||
                 is_equal_vertical(img, col, row,
@@ -102,12 +102,12 @@ int evaluate_third_rule(const CImg<unsigned char>& img) {
     return penalty;
 }
 
-int evaluate_fourth_rule(const CImg<unsigned char>& img) {
+int evaluate_fourth_rule(const MutableQrCode& qr) {
     int dark_modules = 0;
-    int modules = img.height() * img.width();
-    for (int row = 0; row < img.height(); row++) {
-        for (int col = 0; col < img.width(); col++) {
-            if (img(col, row) == BLACK[0]) {
+    int modules = qr.size() * qr.size();
+    for (int row = 0; row < qr.size(); row++) {
+        for (int col = 0; col < qr.size(); col++) {
+            if (qr[col, row] == BLACK[0]) {
                 dark_modules++;
             }
         }

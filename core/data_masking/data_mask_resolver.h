@@ -1,8 +1,6 @@
 #pragma once
 #include "../struct/MutableQrCode.h"
 
-using namespace cimg_library;
-
 struct MaskedImage {
     MutableQrCode qr;
     unsigned char mask;

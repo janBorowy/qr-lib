@@ -8,8 +8,6 @@ target_sources(qr-lib-tests
 	test/qr_matrix_evaluation_tests.cpp
 	test/data_masking_tests.cpp)
 
-target_compile_definitions(qr-lib-tests PRIVATE cimg_display=0)
-
 target_link_libraries(qr-lib-tests PRIVATE Catch2::Catch2WithMain)
 
 set(CPP_SOURCE_FILES
@@ -40,9 +38,5 @@ target_sources(qr-lib
 	BASE_DIRS include
 	FILES include/qrlib.h
 	)
-
-find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
-target_link_libraries(qr-lib ${X11_LIBRARIES})
 
 catch_discover_tests(qr-lib-tests)

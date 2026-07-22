@@ -1,5 +1,6 @@
 #include "MutableQrCode.h"
 #include "../qr_color_constants.h"
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -30,23 +31,15 @@ std::string MutableQrCode::get_data() const { return data; }
 
 size_t MutableQrCode::size() const { return modules.size(); }
 
-// TODO: remove this
-cimg_library::CImg<unsigned char> MutableQrCode::convert() const {
-    cimg_library::CImg<unsigned char> result(size(), size());
-    for (int row = 0; row < size(); row++) {
-        for (int col = 0; col < size(); col++) {
-            result(col, row) = modules[row][col];
-        }
-    }
-    return result;
-}
-
-MutableQrCode::MutableQrCode(const cimg_library::CImg<unsigned char>& img)
+MutableQrCode::MutableQrCode(const std::vector<unsigned char>& modules_input,
+                             size_t size)
     : modules(std::vector<std::vector<unsigned char>>(
-          img.height(), std::vector<unsigned char>(img.width(), 0))) {
-    for (int row = 0; row < img.height(); row++) {
-        for (int col = 0; col < img.width(); col++) {
-            modules[row][col] = img(col, row);
+          size, std::vector<unsigned char>(size, 0))) {
+    assert(modules_input.size() == size * size);
+
+    for (int row = 0; row < size; row++) {
+        for (int col = 0; col < size; col++) {
+            modules[row][col] = modules_input[row * size + col];
         }
     }
 }

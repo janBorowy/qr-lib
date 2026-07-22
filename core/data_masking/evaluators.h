@@ -1,17 +1,16 @@
 #pragma once
 
-#include "../../lib/CImg/CImg.h"
+#include "../struct/MutableQrCode.h"
+
 #include <array>
 #include <functional>
 
-using namespace cimg_library;
+int evaluate_first_rule(const MutableQrCode& img);
+int evaluate_second_rule(const MutableQrCode& img);
+int evaluate_third_rule(const MutableQrCode& img);
+int evaluate_fourth_rule(const MutableQrCode& img);
 
-int evaluate_first_rule(const CImg<unsigned char>& img);
-int evaluate_second_rule(const CImg<unsigned char>& img);
-int evaluate_third_rule(const CImg<unsigned char>& img);
-int evaluate_fourth_rule(const CImg<unsigned char>& img);
-
-using QrEvaluator = std::function<int(const CImg<unsigned char>&)>;
+using QrEvaluator = std::function<int(const MutableQrCode&)>;
 
 constexpr auto make_evaluators() {
     return std::array<QrEvaluator, 4>{evaluate_first_rule, evaluate_second_rule,

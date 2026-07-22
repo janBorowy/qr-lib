@@ -1,4 +1,3 @@
 - refactor api/code
 - setup this to be used as .h library
 - cli interface
-- don't use CImg ?

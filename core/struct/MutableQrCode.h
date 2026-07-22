@@ -1,5 +1,4 @@
 #pragma once
-#include "../../lib/CImg/CImg.h"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -10,9 +9,8 @@ class MutableQrCode {
 
   public:
     MutableQrCode(int size);
-    MutableQrCode(const cimg_library::CImg<unsigned char>& img);
+    MutableQrCode(const std::vector<unsigned char>& modules, size_t size);
 
-    cimg_library::CImg<unsigned char> convert() const;
     std::string get_data() const;
     size_t size() const;
     unsigned char operator[](int x, int y) const;

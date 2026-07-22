@@ -53,11 +53,11 @@ MutableQrCode make_reserved_areas_white(const MutableQrCode& qr) {
 }
 
 int evalute_img(const MutableQrCode& qr) {
-    auto img_for_evaluation = make_reserved_areas_white(qr);
+    auto qr_for_evaluation = make_reserved_areas_white(qr);
     return std::accumulate(QR_EVALUATORS.cbegin(), QR_EVALUATORS.cend(), 0,
-                           [&img_for_evaluation](auto p, auto evaluator) {
+                           [&qr_for_evaluation](auto p, auto evaluator) {
                                return p +
-                                      evaluator(img_for_evaluation.convert());
+                                      evaluator(qr_for_evaluation);
                            });
 }
 
