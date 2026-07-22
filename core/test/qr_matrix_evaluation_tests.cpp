@@ -4,8 +4,8 @@
 #include "catch2/catch_test_macros.hpp"
 #include <numeric>
 
-constexpr unsigned char W = WHITE[0];
-constexpr unsigned char B = BLACK[0];
+constexpr unsigned char W = WHITE;
+constexpr unsigned char B = BLACK;
 const MutableQrCode FIRST_RULE_SAMPLE_MATRIX(
     {W, B, B, B, B, B, W, B, B, W, B, B,  // 1 -> 3
      W, B, B, B, B, B, B, B, W, B, B, B,  // 2 -> 5

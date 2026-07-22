@@ -1,6 +1,5 @@
 #include "qr_code_generator.h"
 #include "data_masking/data_mask_resolver.h"
-#include "include/QrCode.h"
 #include "message_encoding/codewords_assembly.h"
 #include "message_encoding/data_encoding.h"
 #include "module_placement/qr_function_patterns.h"
@@ -31,30 +30,30 @@ serialize_codewords_to_bits_and_pad(const std::vector<qr::Codeword> codewords,
 }
 
 void reserve_separators(MutableQrCode& qr, size_t size) {
-    qr.draw_rect(RESERVED[0], 0, 8, 5, 8);
-    qr[7, 8] = RESERVED[0];
-    qr[8, 8] = RESERVED[0];
-    qr[8, 7] = RESERVED[0];
-    qr.draw_rect(RESERVED[0], 8, 0, 8, 5);
+    qr.draw_rect(RESERVED, 0, 8, 5, 8);
+    qr[7, 8] = RESERVED;
+    qr[8, 8] = RESERVED;
+    qr[8, 7] = RESERVED;
+    qr.draw_rect(RESERVED, 8, 0, 8, 5);
 
-    qr.draw_rect(RESERVED[0], size - 8, 8, size - 1, 8);
-    qr.draw_rect(RESERVED[0], 8, size - 7, 8, size - 1);
+    qr.draw_rect(RESERVED, size - 8, 8, size - 1, 8);
+    qr.draw_rect(RESERVED, 8, size - 7, 8, size - 1);
 }
 
 void reserve_version_information(MutableQrCode& qr, size_t size) {
-    qr.draw_rect(RESERVED[0], size - 11, 0, size - 9, 5);
-    qr.draw_rect(RESERVED[0], 0, size - 11, 5, size - 9);
+    qr.draw_rect(RESERVED, size - 11, 0, size - 9, 5);
+    qr.draw_rect(RESERVED, 0, size - 11, 5, size - 9);
 }
 
 void reserve_finder_patterns(MutableQrCode& qr, size_t size) {
-    qr.draw_rect(RESERVED[0], 0, 0, 8, 8);
-    qr.draw_rect(RESERVED[0], size - 8, 0, size - 1, 8);
-    qr.draw_rect(RESERVED[0], 0, size - 8, 8, size - 1);
+    qr.draw_rect(RESERVED, 0, 0, 8, 8);
+    qr.draw_rect(RESERVED, size - 8, 0, size - 1, 8);
+    qr.draw_rect(RESERVED, 0, size - 8, 8, size - 1);
 }
 
 void reserve_timing_patterns(MutableQrCode& qr, size_t size) {
-    qr.draw_rect(RESERVED[0], 8, 6, size - 8, 6);
-    qr.draw_rect(RESERVED[0], 6, 8, 6, size - 8);
+    qr.draw_rect(RESERVED, 8, 6, size - 8, 6);
+    qr.draw_rect(RESERVED, 6, 8, 6, size - 8);
 }
 
 void reserve_alignment_patterns(MutableQrCode& qr, size_t size, int version) {
@@ -67,7 +66,7 @@ void reserve_alignment_patterns(MutableQrCode& qr, size_t size, int version) {
                 continue;
             if (!(x < 10 && y < 10) && !(x > size - 10 && y < 10) &&
                 !(x < 10 && y > size - 10)) {
-                qr.draw_rect(RESERVED[0], x - 2, y - 2, x + 2, y + 2);
+                qr.draw_rect(RESERVED, x - 2, y - 2, x + 2, y + 2);
             }
         }
     }
@@ -83,7 +82,7 @@ void reserve_area(MutableQrCode& qr, size_t size, int version) {
     }
 }
 
-unsigned char get_bit_color(bool bit) { return bit ? BLACK[0] : WHITE[0]; }
+unsigned char get_bit_color(bool bit) { return bit ? BLACK : WHITE; }
 
 void draw_data_bits(MutableQrCode& qr, const std::vector<bool>& data,
                     size_t size) {
@@ -96,12 +95,12 @@ void draw_data_bits(MutableQrCode& qr, const std::vector<bool>& data,
     while (col_x >= 0) {
         if (place_right) {
             auto& module = qr[col_x + 1, row];
-            if (module == EMPTY[0]) {
+            if (module == EMPTY) {
                 module = get_bit_color(data[i++]);
             }
         } else {
             auto& module = qr[col_x, row];
-            if (module == EMPTY[0]) {
+            if (module == EMPTY) {
                 module = get_bit_color(data[i++]);
             }
             if (goes_up)

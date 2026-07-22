@@ -73,8 +73,8 @@ bool is_equal_vertical(const MutableQrCode& qr, int x, int y,
     return true;
 }
 
-constexpr unsigned char W = WHITE[0];
-constexpr unsigned char B = BLACK[0];
+constexpr unsigned char W = WHITE;
+constexpr unsigned char B = BLACK;
 int evaluate_third_rule(const MutableQrCode& img) {
     int penalty = 0;
     for (int row = 0; row < img.size(); row++) {
@@ -107,7 +107,7 @@ int evaluate_fourth_rule(const MutableQrCode& qr) {
     int modules = qr.size() * qr.size();
     for (int row = 0; row < qr.size(); row++) {
         for (int col = 0; col < qr.size(); col++) {
-            if (qr[col, row] == BLACK[0]) {
+            if (qr[col, row] == BLACK) {
                 dark_modules++;
             }
         }

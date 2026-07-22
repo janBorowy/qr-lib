@@ -8,7 +8,7 @@
 
 MutableQrCode with_quiet_zone(MutableQrCode& qr) {
     MutableQrCode result(qr.size() + 8);
-    result.draw_rect(WHITE[0], 0, 0, result.size() - 1, result.size() - 1);
+    result.draw_rect(WHITE, 0, 0, result.size() - 1, result.size() - 1);
     for (int row = 4; row < result.size() - 4; row++) {
         for (int col = 4; col < result.size() - 4; col++) {
             result[col, row] = qr[col - 4, row - 4];

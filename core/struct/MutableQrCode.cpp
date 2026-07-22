@@ -6,7 +6,7 @@
 
 MutableQrCode::MutableQrCode(int size)
     : modules(std::vector<std::vector<unsigned char>>(
-          size, std::vector<unsigned char>(size, EMPTY[0]))) {}
+          size, std::vector<unsigned char>(size, EMPTY))) {}
 
 unsigned char MutableQrCode::operator[](int x, int y) const {
     return modules[y][x];

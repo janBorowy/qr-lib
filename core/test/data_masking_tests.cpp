@@ -2,9 +2,9 @@
 #include "../qr_color_constants.h"
 #include "catch2/catch_test_macros.hpp"
 
-constexpr unsigned char R = RESERVED[0];
-constexpr unsigned char W = WHITE[0];
-constexpr unsigned char B = BLACK[0];
+constexpr unsigned char R = RESERVED;
+constexpr unsigned char W = WHITE;
+constexpr unsigned char B = BLACK;
 
 const MutableQrCode SAMPLE_QR_MATRIX(
     std::vector<unsigned char>{

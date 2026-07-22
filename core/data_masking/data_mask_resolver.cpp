@@ -31,9 +31,9 @@ MutableQrCode mask_img(const MutableQrCode& qr, DataMask mask) {
     MutableQrCode masked_qr(qr);
     for (int row = 0; row < masked_qr.size(); row++) {
         for (int col = 0; col < masked_qr.size(); col++) {
-            if (mask(col, row) && qr[col, row] != RESERVED[0]) {
+            if (mask(col, row) && qr[col, row] != RESERVED) {
                 masked_qr[col, row] =
-                    masked_qr[col, row] == WHITE[0] ? BLACK[0] : WHITE[0];
+                    masked_qr[col, row] == WHITE ? BLACK : WHITE;
             }
         }
     }
@@ -44,8 +44,8 @@ MutableQrCode make_reserved_areas_white(const MutableQrCode& qr) {
     auto result = qr;
     for (int row = 0; row < qr.size(); row++) {
         for (int col = 0; col < qr.size(); col++) {
-            if (result[col, row] == RESERVED[0]) {
-                result[col, row] = WHITE[0];
+            if (result[col, row] == RESERVED) {
+                result[col, row] = WHITE;
             }
         }
     }
@@ -56,8 +56,7 @@ int evalute_img(const MutableQrCode& qr) {
     auto qr_for_evaluation = make_reserved_areas_white(qr);
     return std::accumulate(QR_EVALUATORS.cbegin(), QR_EVALUATORS.cend(), 0,
                            [&qr_for_evaluation](auto p, auto evaluator) {
-                               return p +
-                                      evaluator(qr_for_evaluation);
+                               return p + evaluator(qr_for_evaluation);
                            });
 }
 
