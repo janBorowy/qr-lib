@@ -1,5 +1,5 @@
-#include "../../lib/CImg/CImg.h"
+#include "../struct/MutableQrCode.h"
 
 using namespace cimg_library;
 
-void draw_function_patterns(CImg<unsigned char>& img, int version);
+void draw_function_patterns(MutableQrCode& qr, int version);

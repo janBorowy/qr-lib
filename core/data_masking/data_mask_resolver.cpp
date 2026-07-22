@@ -27,58 +27,58 @@ constexpr auto make_masks() {
 
 const auto DATA_MASKS = make_masks();
 
-CImg<unsigned char> mask_img(const CImg<unsigned char>& img, DataMask mask) {
-    CImg<unsigned char> masked_img(img);
-    for (int row = 0; row < masked_img.height(); row++) {
-        for (int col = 0; col < masked_img.width(); col++) {
-            if (mask(col, row) && img(col, row) != RESERVED[0]) {
-                masked_img(col, row) =
-                    masked_img(col, row) == WHITE[0] ? BLACK[0] : WHITE[0];
+MutableQrCode mask_img(const MutableQrCode& qr, DataMask mask) {
+    MutableQrCode masked_qr(qr);
+    for (int row = 0; row < masked_qr.size(); row++) {
+        for (int col = 0; col < masked_qr.size(); col++) {
+            if (mask(col, row) && qr[col, row] != RESERVED[0]) {
+                masked_qr[col, row] =
+                    masked_qr[col, row] == WHITE[0] ? BLACK[0] : WHITE[0];
             }
         }
     }
-    return masked_img;
+    return masked_qr;
 }
 
-CImg<unsigned char> make_reserved_areas_white(const CImg<unsigned char>& img) {
-    auto result = img;
-    for (int row = 0; row < img.height(); row++) {
-        for (int col = 0; col < img.width(); col++) {
-            if (result(col, row) == RESERVED[0]) {
-                result(col, row) = WHITE[0];
+MutableQrCode make_reserved_areas_white(const MutableQrCode& qr) {
+    auto result = qr;
+    for (int row = 0; row < qr.size(); row++) {
+        for (int col = 0; col < qr.size(); col++) {
+            if (result[col, row] == RESERVED[0]) {
+                result[col, row] = WHITE[0];
             }
         }
     }
     return result;
 }
 
-int evalute_img(const CImg<unsigned char>& img) {
-    auto img_for_evaluation = make_reserved_areas_white(img);
+int evalute_img(const MutableQrCode& qr) {
+    auto img_for_evaluation = make_reserved_areas_white(qr);
     return std::accumulate(QR_EVALUATORS.cbegin(), QR_EVALUATORS.cend(), 0,
                            [&img_for_evaluation](auto p, auto evaluator) {
-                               return p + evaluator(img_for_evaluation);
+                               return p +
+                                      evaluator(img_for_evaluation.convert());
                            });
 }
 
-MaskedImage get_best_data_mask(const CImg<unsigned char>& img, int version) {
-    std::vector<CImg<unsigned char>> masked_imgs;
+MaskedImage get_best_data_mask(const MutableQrCode& qr, int version) {
+    std::vector<MutableQrCode> masked_qrs;
     std::vector<int> penalties;
     for (const auto& mask : DATA_MASKS) {
-        masked_imgs.push_back(mask_img(img, mask));
+        masked_qrs.push_back(mask_img(qr, mask));
     }
-    std::for_each(masked_imgs.begin(), masked_imgs.end(),
+    std::for_each(masked_qrs.begin(), masked_qrs.end(),
                   [&version](auto& i) { draw_function_patterns(i, version); });
-    for (const auto& masked_img : masked_imgs) {
+    for (const auto& masked_img : masked_qrs) {
         penalties.push_back(evalute_img(masked_img));
     }
     auto smallest = std::min_element(penalties.begin(), penalties.end());
     unsigned char smallest_idx = std::distance(penalties.begin(), smallest);
-    return {.img = masked_imgs[smallest_idx], .mask = smallest_idx};
+    return {.qr = masked_qrs[smallest_idx], .mask = smallest_idx};
 }
 
-CImg<unsigned char> mask_data(const CImg<unsigned char>& img, int version,
-                              int mask) {
-    CImg result(mask_img(img, DATA_MASKS[mask]));
+MutableQrCode mask_data(const MutableQrCode& qr, int version, int mask) {
+    MutableQrCode result(mask_img(qr, DATA_MASKS[mask]));
     draw_function_patterns(result, version);
     return result;
 }

@@ -1,13 +1,12 @@
 #pragma once
-#include "../../lib/CImg/CImg.h"
+#include "../struct/MutableQrCode.h"
 
 using namespace cimg_library;
 
 struct MaskedImage {
-    CImg<unsigned char> img;
+    MutableQrCode qr;
     unsigned char mask;
 };
 
-MaskedImage get_best_data_mask(const CImg<unsigned char>& img, int version);
-CImg<unsigned char> mask_data(const CImg<unsigned char>& img, int version,
-                              int mask);
+MaskedImage get_best_data_mask(const MutableQrCode& qr, int version);
+MutableQrCode mask_data(const MutableQrCode& qr, int version, int mask);

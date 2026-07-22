@@ -180,20 +180,17 @@ MutableQrCode generate_qr_code(const std::string& data,
     auto data_bits = serialize_codewords_to_bits_and_pad(codewords, version);
     int modules = version * 4 + 17;
 
-    MutableQrCode img(modules);
-    reserve_area(img, modules, version);
-    draw_data_bits(img, data_bits, modules);
-    CImg<unsigned char> converted = img.convert();
-    CImg<unsigned char> masked_img;
+    MutableQrCode qr(modules);
+    reserve_area(qr, modules, version);
+    draw_data_bits(qr, data_bits, modules);
     if (mask < 0 || mask > 7) {
-        auto masking_result = get_best_data_mask(converted, version);
-        masked_img = masking_result.img;
+        auto masking_result = get_best_data_mask(qr, version);
+        qr = masking_result.qr;
         mask = masking_result.mask;
     } else {
-        masked_img = mask_data(converted, version, mask);
+        qr = mask_data(qr, version, mask);
     }
-    auto back_to = MutableQrCode(masked_img);
-    draw_format_string(back_to, ec_level, mask);
-    draw_version_string(back_to, version);
-    return back_to;
+    draw_format_string(qr, ec_level, mask);
+    draw_version_string(qr, version);
+    return qr;
 }
