@@ -2,13 +2,11 @@
 
 #include <string>
 
-#include "../lib/CImg/CImg.h"
 #include "include/qrlib.h"
 #include "qr.h"
+#include "struct/MutableQrCode.h"
 
-using cimg_library::CImg;
-
-CImg<unsigned char> generate_qr(const std::string& data,
+MutableQrCode generate_qr_code(const std::string& data,
                                 qr::ErrorCorrectionLevel ec_level,
                                 qr::EncodingMode encoding_mode, int version,
                                 int mask = -1);

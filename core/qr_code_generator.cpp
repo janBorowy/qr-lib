@@ -1,17 +1,17 @@
 #include "qr_code_generator.h"
 #include "data_masking/data_mask_resolver.h"
+#include "include/QrCode.h"
 #include "message_encoding/codewords_assembly.h"
 #include "message_encoding/data_encoding.h"
 #include "module_placement/qr_function_patterns.h"
 #include "qr.h"
 #include "qr_color_constants.h"
+#include "struct/MutableQrCode.h"
 #include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <vector>
-
-using namespace cimg_library;
 
 std::vector<bool>
 serialize_codewords_to_bits_and_pad(const std::vector<qr::Codeword> codewords,
@@ -30,35 +30,34 @@ serialize_codewords_to_bits_and_pad(const std::vector<qr::Codeword> codewords,
     return bits;
 }
 
-void reserve_separators(CImg<unsigned char>& img, size_t size) {
-    img.draw_line(0, 8, 5, 8, RESERVED);
-    img.atXY(7, 8) = RESERVED[0];
-    img.atXY(8, 8) = RESERVED[0];
-    img.atXY(8, 7) = RESERVED[0];
-    img.draw_line(8, 0, 8, 5, RESERVED);
+void reserve_separators(MutableQrCode& qr, size_t size) {
+    qr.draw_rect(RESERVED[0], 0, 8, 5, 8);
+    qr[7, 8] = RESERVED[0];
+    qr[8, 8] = RESERVED[0];
+    qr[8, 7] = RESERVED[0];
+    qr.draw_rect(RESERVED[0], 8, 0, 8, 5);
 
-    img.draw_line(size - 8, 8, size - 1, 8, RESERVED);
-    img.draw_line(8, size - 7, 8, size - 1, RESERVED);
+    qr.draw_rect(RESERVED[0], size - 8, 8, size - 1, 8);
+    qr.draw_rect(RESERVED[0], 8, size - 7, 8, size - 1);
 }
 
-void reserve_version_information(CImg<unsigned char>& img, size_t size) {
-    img.draw_rectangle(size - 11, 0, size - 9, 5, RESERVED);
-    img.draw_rectangle(0, size - 11, 5, size - 9, RESERVED);
+void reserve_version_information(MutableQrCode& qr, size_t size) {
+    qr.draw_rect(RESERVED[0], size - 11, 0, size - 9, 5);
+    qr.draw_rect(RESERVED[0], 0, size - 11, 5, size - 9);
 }
 
-void reserve_finder_patterns(CImg<unsigned char>& img, size_t size) {
-    img.draw_rectangle(0, 0, 8, 8, RESERVED);
-    img.draw_rectangle(size - 8, 0, size - 1, 8, RESERVED);
-    img.draw_rectangle(0, size - 8, 8, size - 1, RESERVED);
+void reserve_finder_patterns(MutableQrCode& qr, size_t size) {
+    qr.draw_rect(RESERVED[0], 0, 0, 8, 8);
+    qr.draw_rect(RESERVED[0], size - 8, 0, size - 1, 8);
+    qr.draw_rect(RESERVED[0], 0, size - 8, 8, size - 1);
 }
 
-void reserve_timing_patterns(CImg<unsigned char>& img, size_t size) {
-    img.draw_line(8, 6, size - 8, 6, RESERVED);
-    img.draw_line(6, 8, 6, size - 8, RESERVED);
+void reserve_timing_patterns(MutableQrCode& qr, size_t size) {
+    qr.draw_rect(RESERVED[0], 8, 6, size - 8, 6);
+    qr.draw_rect(RESERVED[0], 6, 8, 6, size - 8);
 }
 
-void reserve_alignment_patterns(CImg<unsigned char>& img, size_t size,
-                                int version) {
+void reserve_alignment_patterns(MutableQrCode& qr, size_t size, int version) {
     auto indices = qr::VERSION_TO_ALIGNMENT_PATTERN_LOCATIONS[version];
     for (const auto& x : indices) {
         if (x == 0)
@@ -68,25 +67,25 @@ void reserve_alignment_patterns(CImg<unsigned char>& img, size_t size,
                 continue;
             if (!(x < 10 && y < 10) && !(x > size - 10 && y < 10) &&
                 !(x < 10 && y > size - 10)) {
-                img.draw_rectangle(x - 2, y - 2, x + 2, y + 2, RESERVED);
+                qr.draw_rect(RESERVED[0], x - 2, y - 2, x + 2, y + 2);
             }
         }
     }
 }
 
-void reserve_area(CImg<unsigned char>& img, size_t size, int version) {
-    reserve_finder_patterns(img, size);
-    reserve_timing_patterns(img, size);
-    reserve_alignment_patterns(img, size, version);
-    reserve_separators(img, size);
+void reserve_area(MutableQrCode& qr, size_t size, int version) {
+    reserve_finder_patterns(qr, size);
+    reserve_timing_patterns(qr, size);
+    reserve_alignment_patterns(qr, size, version);
+    reserve_separators(qr, size);
     if (version >= 7) {
-        reserve_version_information(img, size);
+        reserve_version_information(qr, size);
     }
 }
 
 unsigned char get_bit_color(bool bit) { return bit ? BLACK[0] : WHITE[0]; }
 
-void draw_data_bits(CImg<unsigned char>& img, const std::vector<bool>& data,
+void draw_data_bits(MutableQrCode& qr, const std::vector<bool>& data,
                     size_t size) {
     bool goes_up = true;
     bool place_right = true;
@@ -96,12 +95,12 @@ void draw_data_bits(CImg<unsigned char>& img, const std::vector<bool>& data,
 
     while (col_x >= 0) {
         if (place_right) {
-            auto& module = img.atXY(col_x + 1, row);
+            auto& module = qr[col_x + 1, row];
             if (module == EMPTY[0]) {
                 module = get_bit_color(data[i++]);
             }
         } else {
-            auto& module = img.atXY(col_x, row);
+            auto& module = qr[col_x, row];
             if (module == EMPTY[0]) {
                 module = get_bit_color(data[i++]);
             }
@@ -128,36 +127,36 @@ void draw_data_bits(CImg<unsigned char>& img, const std::vector<bool>& data,
     assert(i == data.size());
 }
 
-void draw_format_string(CImg<unsigned char>& img,
-                        qr::ErrorCorrectionLevel ec_level, unsigned char mask) {
+void draw_format_string(MutableQrCode& qr, qr::ErrorCorrectionLevel ec_level,
+                        unsigned char mask) {
     auto bits = qr::EC_AND_MASK_TO_FORMAT_STRING.at(ec_level)[mask];
     for (int col = 0; col < 6; col++) {
-        img(col, 8) = get_bit_color(bits[col]);
+        qr[col, 8] = get_bit_color(bits[col]);
     }
-    img(7, 8) = get_bit_color(bits[6]);
-    img(8, 8) = get_bit_color(bits[7]);
-    img(8, 7) = get_bit_color(bits[8]);
+    qr[7, 8] = get_bit_color(bits[6]);
+    qr[8, 8] = get_bit_color(bits[7]);
+    qr[8, 7] = get_bit_color(bits[8]);
     for (int row = 5; row >= 0; row--) {
-        img(8, row) = get_bit_color(bits[14 - row]);
+        qr[8, row] = get_bit_color(bits[14 - row]);
     }
 
-    for (int row = img.height() - 1; row >= img.height() - 7; row--) {
-        img(8, row) = get_bit_color(bits[img.height() - row - 1]);
+    for (int row = qr.size() - 1; row >= qr.size() - 7; row--) {
+        qr[8, row] = get_bit_color(bits[qr.size() - row - 1]);
     }
 
-    for (int col = img.width() - 8; col < img.width(); col++) {
-        img(col, 8) = get_bit_color(bits[col + 15 - img.width()]);
+    for (int col = qr.size() - 8; col < qr.size(); col++) {
+        qr[col, 8] = get_bit_color(bits[col + 15 - qr.size()]);
     }
 }
 
-void draw_version_string(CImg<unsigned char>& img, int version) {
+void draw_version_string(MutableQrCode& qr, int version) {
     if (version < 7)
         return;
     auto bits = qr::VERSION_TO_VERSION_STRING[version];
     auto it = bits.rbegin();
     for (int col = 0; col < 6; col++) {
-        for (int row = img.height() - 11; row <= img.height() - 9; row++) {
-            img(col, row) = get_bit_color(*it++);
+        for (int row = qr.size() - 11; row <= qr.size() - 9; row++) {
+            qr[col, row] = get_bit_color(*it++);
         }
     }
 
@@ -165,34 +164,36 @@ void draw_version_string(CImg<unsigned char>& img, int version) {
     it = bits.rbegin();
 
     for (int row = 0; row < 6; row++) {
-        for (int col = img.width() - 11; col <= img.width() - 9; col++) {
-            img(col, row) = get_bit_color(*it++);
+        for (int col = qr.size() - 11; col <= qr.size() - 9; col++) {
+            qr[col, row] = get_bit_color(*it++);
         }
     }
     assert(it == bits.rend());
 }
 
-CImg<unsigned char> generate_qr(const std::string& data,
-                                qr::ErrorCorrectionLevel ec_level,
-                                qr::EncodingMode encoding_mode, int version,
-                                int mask) {
+MutableQrCode generate_qr_code(const std::string& data,
+                               qr::ErrorCorrectionLevel ec_level,
+                               qr::EncodingMode encoding_mode, int version,
+                               int mask) {
     auto data_codewords = encode_data(data, encoding_mode, version, ec_level);
     auto codewords = assemble_data_codewords(data_codewords, version, ec_level);
     auto data_bits = serialize_codewords_to_bits_and_pad(codewords, version);
     int modules = version * 4 + 17;
 
-    CImg<unsigned char> img(modules, modules, 1, 1, EMPTY[0]);
+    MutableQrCode img(modules);
     reserve_area(img, modules, version);
     draw_data_bits(img, data_bits, modules);
+    CImg<unsigned char> converted = img.convert();
     CImg<unsigned char> masked_img;
     if (mask < 0 || mask > 7) {
-        auto masking_result = get_best_data_mask(img, version);
+        auto masking_result = get_best_data_mask(converted, version);
         masked_img = masking_result.img;
         mask = masking_result.mask;
     } else {
-        masked_img = mask_data(img, version, mask);
+        masked_img = mask_data(converted, version, mask);
     }
-    draw_format_string(masked_img, ec_level, mask);
-    draw_version_string(masked_img, version);
-    return masked_img;
+    auto back_to = MutableQrCode(masked_img);
+    draw_format_string(back_to, ec_level, mask);
+    draw_version_string(back_to, version);
+    return back_to;
 }

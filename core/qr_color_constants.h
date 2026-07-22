@@ -1,4 +1,5 @@
 #pragma once
+// TODO: change this to single value
 constexpr unsigned char BLACK[] = {0, 0, 0};
 constexpr unsigned char EMPTY[] = {64, 0, 0};
 constexpr unsigned char RESERVED[] = {196, 0, 0};

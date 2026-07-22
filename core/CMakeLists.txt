@@ -22,6 +22,8 @@ message_encoding/codewords_assembly.cpp
 module_placement/qr_function_patterns.cpp
 data_masking/data_mask_resolver.cpp
 data_masking/evaluators.cpp
+struct/MutableQrCode.cpp
+struct/QrCode.cpp
 qr_code_generator.cpp
 qrlib.cpp
 )
